@@ -1,0 +1,267 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  STUDENT
+  FACULTY
+  PARENT
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  role         UserRole
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  
+  // Profiles
+  adminProfile   Admin?
+  studentProfile Student?
+  facultyProfile Faculty?
+  parentProfile  Parent?
+
+  // System Logs
+  auditLogs      AuditLog[]
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  phone     String?
+}
+
+model Department {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  code      String    @unique
+  students  Student[]
+  faculty   Faculty[]
+  courses   Course[]
+}
+
+model Course {
+  id           String     @id @default(uuid())
+  name         String
+  code         String     @unique
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  subjects     Subject[]
+  students     Student[]
+}
+
+model Subject {
+  id           String      @id @default(uuid())
+  name         String
+  code         String      @unique
+  credits      Int         @default(3)
+  courseId     String
+  course       Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  facultyId    String?
+  faculty      Faculty?    @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  assignments  Assignment[]
+  marks        Mark[]
+}
+
+model Student {
+  id           String       @id @default(uuid())
+  userId       String       @unique
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName    String
+  lastName     String
+  rollNumber   String       @unique
+  phone        String?
+  admissionDate DateTime     @default(now())
+  status       String       @default("ACTIVE") // ACTIVE, GRADUATED, SUSPENDED
+  
+  departmentId String
+  department   Department   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  courseId     String
+  course       Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  parentId     String?
+  parent       Parent?      @relation(fields: [parentId], references: [id], onDelete: SetNull)
+  
+  // Operational Module Relations
+  attendance   Attendance[]
+  marks        Mark[]
+  results      Result[]
+  payments     Payment[]
+  libraryBooks LibraryBook[]
+  
+  // Hostel & Transport Allocations
+  hostelRoomId String?
+  hostelRoom   HostelRoom?  @relation(fields: [hostelRoomId], references: [id], onDelete: SetNull)
+  routeId      String?
+  route        TransportRoute? @relation(fields: [routeId], references: [id], onDelete: SetNull)
+}
+
+model Faculty {
+  id           String       @id @default(uuid())
+  userId       String       @unique
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName    String
+  lastName     String
+  employeeId   String       @unique
+  designation  String
+  phone        String?
+  
+  departmentId String
+  department   Department   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  subjects     Subject[]
+}
+
+model Parent {
+  id        String    @id @default(uuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  phone     String
+  students  Student[]
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  date      DateTime
+  status    String   // PRESENT, ABSENT, LATE, EXCUSED
+}
+
+model Assignment {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  dueDate     DateTime
+  fileUrl     String?
+  subjectId   String
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+model Examination {
+  id        String   @id @default(uuid())
+  name      String
+  date      DateTime
+  type      String   // INTERNAL, SEMESTER, MID_TERM
+  marks     Mark[]
+}
+
+model Mark {
+  id            String      @id @default(uuid())
+  studentId     String
+  student       Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId     String
+  subject       Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  examinationId String
+  examination   Examination @relation(fields: [examinationId], references: [id], onDelete: Cascade)
+  marksObtained Float
+  maxMarks      Float
+}
+
+model Result {
+  id         String   @id @default(uuid())
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  semester   String   // Semester e.g., "SEMESTER_1"
+  gpa        Float
+  cgpa       Float
+  passStatus String   // PASSED, FAILED
+}
+
+model Payment {
+  id             String   @id @default(uuid())
+  studentId      String
+  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  amount         Float
+  paymentDate    DateTime @default(now())
+  category       String   // TUITION, HOSTEL, TRANSPORT, EXAM, LIBRARY
+  status         String   // SUCCESS, PENDING, FAILED
+  paymentMethod  String   // CARD, NET_BANKING, UPI
+  invoiceNumber  String   @unique
+}
+
+model LibraryBook {
+  id          String   @id @default(uuid())
+  title       String
+  author      String
+  isbn        String   @unique
+  available   Boolean  @default(true)
+  borrowedById String?
+  borrowedBy  Student? @relation(fields: [borrowedById], references: [id], onDelete: SetNull)
+  dueDate     DateTime?
+}
+
+model HostelRoom {
+  id          String    @id @default(uuid())
+  roomNumber  String    @unique
+  blockName   String
+  capacity    Int       @default(4)
+  occupancy   Int       @default(0)
+  fee         Float
+  students    Student[]
+}
+
+model TransportRoute {
+  id            String    @id @default(uuid())
+  name          String    @unique
+  vehicleNumber String
+  driverName    String
+  fee           Float
+  students      Student[]
+}
+
+model Notification {
+  id           String   @id @default(uuid())
+  title        String
+  message      String
+  roleTarget   String   // ALL, ADMIN, STUDENT, FACULTY, PARENT
+  isRead       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model Complaint {
+  id           String   @id @default(uuid())
+  title        String
+  description  String
+  status       String   @default("PENDING") // PENDING, RESOLVED, REJECTED
+  submittedBy  String   // User role or Email
+  resolution   String?
+  createdAt    DateTime @default(now())
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  date      DateTime @default(now())
+  postedBy  String   // e.g., "Administrator"
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  details   String
+  ipAddress String
+  timestamp DateTime @default(now())
+}

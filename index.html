@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise ERP Student Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#2563EB', dark: '#1D4ED8' },
+            secondary: { DEFAULT: '#10B981', dark: '#059669' },
+            success: '#22C55E',
+            warning: '#F59E0B',
+            danger: '#EF4444',
+            surface: { DEFAULT: '#F8FAFC', dark: '#0F172A' },
+            border: { DEFAULT: '#E5E7EB', dark: '#334155' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Poppins', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Card styles */
+    .erp-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .erp-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); transform: translateY(-1px); }
+
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .stat-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+
+    /* Fade-in animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.3s ease forwards; }
+
+    /* Chat bubbles */
+    .chat-user-msg {
+      background: #EFF6FF;
+      color: #1e40af;
+      border-radius: 10px 10px 2px 10px;
+      padding: 8px 12px;
+      margin-left: 28px;
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .chat-bot-msg {
+      background: #F8FAFC;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+      border-radius: 2px 10px 10px 10px;
+      padding: 8px 12px;
+      margin-right: 16px;
+      font-size: 11px;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    /* Sidebar nav item */
+    .nav-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #6b7280;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      border: none;
+      background: transparent;
+      text-align: left;
+    }
+    .nav-item:hover { background: #f1f5f9; color: #111827; }
+    .nav-item.active { background: #2563EB; color: #ffffff; }
+
+    /* Progress bar */
+    .progress-bar-bg { background: #e5e7eb; border-radius: 99px; height: 6px; }
+    .progress-bar-fill { background: #2563EB; border-radius: 99px; height: 6px; transition: width 0.5s ease; }
+
+    /* Role badge */
+    .role-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+    .role-badge-student  { background:#dbeafe; color:#1d4ed8; }
+    .role-badge-faculty  { background:#d1fae5; color:#065f46; }
+    .role-badge-admin    { background:#fee2e2; color:#b91c1c; }
+    .role-badge-parent   { background:#fef3c7; color:#92400e; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen transition-colors duration-150">
+
+  <!-- ================= LANDING PAGE ================= -->
+  <div id="landing-page" class="block">
+    <nav class="flex items-center justify-between w-full h-16 px-8 bg-white border-b border-gray-200">
+      <div class="flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold">E</span>
+        <span class="text-md font-bold text-gray-900">ERP Institution</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="#features" class="text-sm font-medium text-gray-500 hover:text-primary">Features</a>
+        <button onclick="showLogin()" class="flex items-center justify-center h-9 px-4 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark">
+          Portal Login
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="flex flex-col items-center justify-center text-center px-6 py-20 bg-white border-b border-gray-100">
+      <span class="px-3 py-1 text-xs font-semibold text-primary bg-blue-50 rounded-full mb-4">Enterprise Student Management System</span>
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight max-w-2xl leading-tight">
+        Unified Educational Management for Modern Universities
+      </h1>
+      <p class="mt-4 text-sm text-gray-500 max-w-lg">
+        Integrated dashboards for administrators, faculty members, parents, and students. Experience seamless scheduling, online fee collections, and grading sheets.
+      </p>
+      <div class="mt-8 flex gap-4">
+        <button onclick="showLogin()" class="flex items-center justify-center h-10 px-6 font-semibold text-white bg-primary rounded-md hover:bg-primary-dark">
+          Sign In to Portal
+        </button>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="px-8 py-16 max-w-7xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl font-bold text-gray-900">Comprehensive Modules</h2>
+        <p class="text-xs text-gray-400 mt-1">Full-stack ERP system built for institutional scale.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="p-6 bg-white border border-gray-200 rounded-lg">
+          <div class="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-primary mb-4"><i data-lucide="graduation-cap"></i></div>
+          <h3 class="text-sm font-bold text-gray-900">Academic Records</h3>
+          <p class="text-xs text-gray-500 mt-2 leading-relaxed">Manage courses, departments, syllabus cataloging, and classes.</p>
+        </div>
+        <div class="p-6 bg-white border border-gray-200 rounded-lg">
+          <div class="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-primary mb-4"><i data-lucide="book-open"></i></div>
+          <h3 class="text-sm font-bold text-gray-900">LMS Submissions</h3>
+          <p class="text-xs text-gray-500 mt-2 leading-relaxed">Upload syllabus materials, create assignments, and review grades.</p>
+        </div>
+        <div class="p-6 bg-white border border-gray-200 rounded-lg">
+          <div class="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-primary mb-4"><i data-lucide="shield-check"></i></div>
+          <h3 class="text-sm font-bold text-gray-900">Finance & Fee Portal</h3>
+          <p class="text-xs text-gray-500 mt-2 leading-relaxed">Simulated credit card checkout to clear student tuition dues.</p>
+        </div>
+        <div class="p-6 bg-white border border-gray-200 rounded-lg">
+          <div class="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-primary mb-4"><i data-lucide="calendar"></i></div>
+          <h3 class="text-sm font-bold text-gray-900">AI Assistant & Predictor</h3>
+          <p class="text-xs text-gray-500 mt-2 leading-relaxed">Interactive helper assistant chatbot and GPA risk predictor models.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= LOGIN PAGE ================= -->
+  <div id="login-page" class="hidden min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    
+    <!-- Retractable Demo Credentials Drawer -->
+    <div class="fixed right-0 top-1/4 bg-white border border-gray-200 rounded-l-xl shadow-lg p-4 z-50 transition-all duration-300 transform translate-x-[82%] hover:translate-x-0 w-64 flex gap-3">
+      <div class="flex flex-col items-center justify-center text-primary cursor-pointer w-6 flex-shrink-0">
+        <i data-lucide="key" class="w-4 h-4 animate-bounce"></i>
+        <span class="text-[9px] font-bold uppercase tracking-widest [writing-mode:vertical-lr] mt-2 text-gray-500">DEMO LOGINS</span>
+      </div>
+      <div class="flex-1 space-y-2">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Click to auto-fill</p>
+        <button onclick="quickFill('admin@erp.com', 'ADMIN')" class="w-full text-left p-1.5 text-[11px] bg-slate-50 hover:bg-slate-100 rounded border border-gray-100 dark:text-gray-700">
+          <strong>💼 Admin</strong>
+          <div class="text-[9px] text-gray-400">Rajesh Kumar</div>
+        </button>
+        <button onclick="quickFill('faculty1@erp.com', 'FACULTY')" class="w-full text-left p-1.5 text-[11px] bg-slate-50 hover:bg-slate-100 rounded border border-gray-100 dark:text-gray-700">
+          <strong>🎓 Faculty</strong>
+          <div class="text-[9px] text-gray-400">Dr. Ramesh Krishnan</div>
+        </button>
+        <button onclick="quickFill('student1@erp.com', 'STUDENT')" class="w-full text-left p-1.5 text-[11px] bg-slate-50 hover:bg-slate-100 rounded border border-gray-100 dark:text-gray-700">
+          <strong>📖 Student</strong>
+          <div class="text-[9px] text-gray-400">Arjun Sharma</div>
+        </button>
+        <button onclick="quickFill('parent1@erp.com', 'PARENT')" class="w-full text-left p-1.5 text-[11px] bg-slate-50 hover:bg-slate-100 rounded border border-gray-100 dark:text-gray-700">
+          <strong>👪 Parent</strong>
+          <div class="text-[9px] text-gray-400">Suresh Sharma</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Container Card -->
+    <div class="max-w-4xl w-full bg-[#f8fafc] border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+      
+      <!-- Left Side (Visual Panel matching the image) -->
+      <div class="relative md:w-5/12 bg-gradient-to-br from-[#0F4C81] to-[#0A3356] text-white flex flex-col justify-between p-8 overflow-hidden hidden md:flex">
+        <!-- Campus image overlay -->
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay opacity-30"></div>
+        
+        <!-- Diagonal Shape Wedges -->
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-[#1D4ED8]/30 rotate-45 rounded-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-4 w-full h-1/2 bg-[#0284c7]/20 -skew-y-12 pointer-events-none"></div>
+
+        <!-- Upper Content -->
+        <div class="relative z-10 space-y-2">
+          <h2 class="text-3xl font-extrabold tracking-tight font-display text-white">ERP</h2>
+          <p class="text-[9px] font-semibold text-blue-200 uppercase tracking-widest">STUDENT MANAGEMENT SYSTEM</p>
+          <div class="w-12 h-1 bg-white rounded my-3"></div>
+          <p class="text-xs font-semibold text-slate-100 leading-relaxed max-w-[200px]">
+            One Platform, All Academy Operations Simplified.
+          </p>
+        </div>
+
+        <!-- Features Check Items -->
+        <div class="relative z-10 space-y-3 pt-12">
+          <div class="flex items-center gap-3 text-xs font-medium text-slate-200">
+            <span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-white"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i></span>
+            <span>Secure Login</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-medium text-slate-200">
+            <span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-white"><i data-lucide="users" class="w-3.5 h-3.5"></i></span>
+            <span>Role Based Access</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-medium text-slate-200">
+            <span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-white"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i></span>
+            <span>Smart Dashboard</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-medium text-slate-200">
+            <span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-white"><i data-lucide="bell" class="w-3.5 h-3.5"></i></span>
+            <span>Real-time Updates</span>
+          </div>
+        </div>
+
+        <!-- Bottom Copyright -->
+        <div class="relative z-10 text-[9px] text-blue-200/80">
+          © 2026 ERP Student Management System. All Rights Reserved.
+        </div>
+      </div>
+
+      <!-- Right Side (Login Box matching the image) -->
+      <div class="w-full md:w-7/12 bg-white flex flex-col justify-between p-8 md:p-12 relative overflow-hidden">
+        
+        <!-- Crest Logo & Headers -->
+        <div class="flex flex-col items-center text-center mt-2">
+          <!-- Custom Wreath Graduation SVG Crest -->
+          <svg class="w-16 h-16 text-[#0F4C81]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Mortarboard Hat -->
+            <path d="M50 25L80 37L50 49L20 37L50 25Z" fill="#0F4C81"/>
+            <path d="M32 41V55C32 60 40 64 50 64C60 64 68 60 68 55V41" stroke="#0F4C81" stroke-width="2.5" fill="none"/>
+            <path d="M76 38.5V55" stroke="#0F4C81" stroke-width="2"/>
+            <circle cx="76" cy="55" r="2" fill="#0F4C81"/>
+            <!-- Laurels Left branch -->
+            <path d="M22 68C16 60 14 50 18 40C20 34 25 30 30 27" stroke="#0F4C81" stroke-width="2" stroke-dasharray="1 3"/>
+            <!-- Laurel Leaves Left -->
+            <path d="M20 62C18 60 16 60 15 62C14 64 15 66 18 66C20 66 21 64 20 62Z" fill="#0F4C81"/>
+            <path d="M17 52C15 50 13 50 12 52C11 54 12 56 15 56C17 56 18 54 17 52Z" fill="#0F4C81"/>
+            <path d="M17 42C15 40 13 40 12 42C11 44 12 46 15 46C17 46 18 44 17 42Z" fill="#0F4C81"/>
+            <!-- Laurels Right branch -->
+            <path d="M78 68C84 60 86 50 82 40C80 34 75 30 70 27" stroke="#0F4C81" stroke-width="2" stroke-dasharray="1 3"/>
+            <!-- Laurel Leaves Right -->
+            <path d="M80 62C82 60 84 60 85 62C86 64 85 66 82 66C80 66 79 64 80 62Z" fill="#0F4C81"/>
+            <path d="M83 52C85 50 87 50 88 52C89 54 88 56 85 56C83 56 82 54 83 52Z" fill="#0F4C81"/>
+            <path d="M83 42C85 40 87 40 88 42C89 44 88 46 85 46C83 46 82 44 83 42Z" fill="#0F4C81"/>
+          </svg>
+
+          <h1 class="text-3xl font-extrabold text-[#0F4C81] tracking-wide mt-1 font-display">ERP</h1>
+          <p class="text-[12px] font-bold text-gray-800 leading-tight">ERP-Based Integrated</p>
+          <p class="text-[12px] font-bold text-gray-800 leading-tight">Student Management System</p>
+          
+          <div class="mt-3 flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-gray-500">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+          </div>
+
+          <h3 class="text-xs font-bold text-gray-800 mt-2">Welcome Back!</h3>
+          <p class="text-[10px] text-gray-400 font-medium">Login to access your account</p>
+        </div>
+
+        <!-- Form fields matching screenshot -->
+        <form onsubmit="handleLogin(event)" class="space-y-3.5 mt-6">
+          
+          <!-- Select Role -->
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Select Role</label>
+            <div class="relative">
+              <select id="login-role" required class="w-full h-10 pl-9 pr-8 text-xs bg-slate-50 border border-gray-200 rounded-md focus:outline-none focus:border-primary appearance-none font-medium text-gray-700">
+                <option value="STUDENT">Student</option>
+                <option value="FACULTY">Faculty</option>
+                <option value="ADMIN">Administrator</option>
+                <option value="PARENT">Parent</option>
+              </select>
+              <i data-lucide="user" class="absolute left-3 top-3.5 w-3.5 h-3.5 text-gray-400"></i>
+              <i data-lucide="chevron-down" class="absolute right-3 top-3.5 w-3.5 h-3.5 text-gray-400 pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- Username/Email -->
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Username</label>
+            <div class="relative">
+              <input type="email" id="login-email" required placeholder="Enter username" class="w-full h-10 pl-9 pr-4 text-xs bg-slate-50 border border-gray-200 rounded-md focus:outline-none focus:border-primary font-medium text-gray-700"/>
+              <i data-lucide="user" class="absolute left-3 top-3.5 w-3.5 h-3.5 text-gray-400"></i>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Password</label>
+            <div class="relative">
+              <input type="password" id="login-password" required placeholder="Enter password" class="w-full h-10 pl-9 pr-10 text-xs bg-slate-50 border border-gray-200 rounded-md focus:outline-none focus:border-primary font-medium text-gray-700"/>
+              <i data-lucide="lock" class="absolute left-3 top-3.5 w-3.5 h-3.5 text-gray-400"></i>
+              <button type="button" onclick="togglePasswordVis()" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+                <i id="password-eye-icon" data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Remember Me / Forgot Password -->
+          <div class="flex justify-between items-center text-[10px] pt-1">
+            <label class="flex items-center gap-1.5 font-semibold text-gray-400 cursor-pointer select-none">
+              <input type="checkbox" class="w-3.5 h-3.5 border-gray-300 rounded text-primary focus:ring-primary"/>
+              <span>Remember Me</span>
+            </label>
+            <a href="#" onclick="alert('Please contact the central institution IT desk to request password resets.')" class="font-semibold text-primary hover:underline">Forgot Password?</a>
+          </div>
+
+          <!-- Login Button -->
+          <button type="submit" class="w-full h-10 mt-2 bg-[#0F4C81] hover:bg-[#0C3F6B] text-white font-semibold text-xs rounded-md shadow flex items-center justify-center gap-2 transition-colors">
+            <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+            <span>Login</span>
+          </button>
+        </form>
+
+        <!-- Divider and New User Button -->
+        <div class="mt-4 space-y-3">
+          <div class="flex items-center justify-center gap-2">
+            <div class="h-[1px] bg-gray-100 flex-1"></div>
+            <span class="text-[9px] font-bold text-gray-400 uppercase">OR</span>
+            <div class="h-[1px] bg-gray-100 flex-1"></div>
+          </div>
+
+          <button onclick="alert('Please contact the central institution IT desk to register a new user ID.')" class="w-full h-10 border border-gray-200 hover:bg-slate-50 text-gray-600 font-semibold text-xs rounded-md flex items-center justify-center gap-2 transition-colors">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+            <span>New User? Contact Admin</span>
+          </button>
+        </div>
+
+        <!-- Footer for Mobile -->
+        <div class="text-center text-[8px] text-gray-400 mt-6 md:hidden">
+          © 2026 ERP Student Management System.
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MAIN ERP PORTAL ================= -->
+  <div id="erp-portal" class="hidden h-screen flex overflow-hidden bg-slate-50">
+
+    <!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+    <aside class="w-60 h-full bg-white border-r border-gray-100 flex flex-col flex-shrink-0">
+      <!-- Brand header -->
+      <div class="flex items-center gap-3 h-16 px-5 border-b border-gray-100">
+        <span class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm">E</span>
+        <div>
+          <h2 class="text-sm font-bold text-gray-900 leading-tight">ERP Portal</h2>
+          <span class="text-[9px] text-gray-400 uppercase font-bold tracking-widest">Student System</span>
+        </div>
+      </div>
+
+      <!-- User profile mini card -->
+      <div id="sidebar-profile" class="px-4 py-4 border-b border-gray-100"></div>
+
+      <!-- Navigation -->
+      <nav id="sidebar-nav" class="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto"></nav>
+
+      <!-- Footer -->
+      <div class="p-4 border-t border-gray-100 text-center text-[9px] text-gray-300">
+        Enterprise System &copy; 2026 &nbsp;v4.1
+      </div>
+    </aside>
+
+    <!-- ── MAIN CONTENT AREA ───────────────────────────────────── -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Top navbar -->
+      <header class="h-16 px-6 bg-white border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <h1 id="navbar-title" class="text-base font-bold text-gray-900">Dashboard Overview</h1>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-right hidden sm:block">
+            <p id="user-display-name" class="text-xs font-semibold text-gray-800"></p>
+            <p id="user-display-role" class="text-[10px] text-gray-400 font-bold uppercase tracking-wide"></p>
+          </div>
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold" id="user-avatar-initial">U</div>
+          <button onclick="handleLogout()" class="p-2 text-gray-400 rounded-lg hover:bg-red-50 hover:text-danger transition-colors" title="Logout">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main dashboard content -->
+      <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
+        <div id="content-container" class="fade-in"></div>
+      </main>
+    </div>
+
+    <!-- ── AI CHATBOX PANEL (always expanded, right side) ─────────── -->
+    <aside class="w-72 h-full bg-white border-l border-gray-100 flex flex-col flex-shrink-0">
+      <!-- Chat header -->
+      <div class="h-16 px-4 border-b border-gray-100 flex items-center gap-2 flex-shrink-0 bg-gradient-to-r from-blue-600 to-blue-700">
+        <div class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
+          <i data-lucide="bot" class="w-4 h-4 text-white"></i>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-white">ERP AI Assistant</p>
+          <p class="text-[9px] text-blue-200">Ask any ERP question</p>
+        </div>
+        <span class="ml-auto w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+      </div>
+
+      <!-- Chat messages -->
+      <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-1 bg-slate-50">
+        <div class="chat-bot-msg">👋 Hello! I'm your ERP assistant. Ask me anything about student modules, attendance, marks, fees, or any viva questions!</div>
+      </div>
+
+      <!-- Chat input -->
+      <form onsubmit="sendAiChat(event)" class="p-3 border-t border-gray-100 flex gap-2 bg-white flex-shrink-0">
+        <input type="text" id="chat-input" placeholder="Ask a question..." autocomplete="off"
+          class="flex-1 h-9 px-3 text-xs bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-blue-200 transition-all"/>
+        <button type="submit" class="w-9 h-9 bg-primary hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-colors flex-shrink-0">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        </button>
+      </form>
+    </aside>
+
+  </div>
+
+  <!-- ================= JAVASCRIPT ================= -->
+  <script>
+    // State Manager
+    let currentUser = null;
+    let currentTab = 'dashboard';
+    
+    // Sample state databases
+    const db = {
+      departments: [
+        { name: 'Computer Science & Engineering', code: 'CSE', count: '180 students / 12 faculty' },
+        { name: 'Information Technology', code: 'IT', count: '120 students / 8 faculty' },
+        { name: 'Electronics & Communication', code: 'ECE', count: '150 students / 10 faculty' }
+      ],
+      courses: [
+        { code: 'CSE-101', name: 'Bachelor of Technology in CSE', dept: 'Computer Science' },
+        { code: 'IT-202', name: 'B.Sc. Information Technology', dept: 'Information Technology' }
+      ],
+      students: [
+        { rollNumber: 'ROLL2026001', name: 'Arjun Sharma', dept: 'Computer Science', course: 'B.Tech CSE', phone: '9876543201' },
+        { rollNumber: 'ROLL2026002', name: 'Priya Nair', dept: 'Information Technology', course: 'B.Sc IT', phone: '9876543202' },
+        { rollNumber: 'ROLL2026003', name: 'Rahul Verma', dept: 'Electronics & Communication', course: 'B.Tech ECE', phone: '9876543203' }
+      ],
+      faculty: [
+        { empId: 'EMP1001', name: 'Dr. Ramesh Krishnan', desig: 'Professor', dept: 'Computer Science' },
+        { empId: 'EMP1002', name: 'Dr. Anitha Subramaniam', desig: 'Assistant Professor', dept: 'Information Technology' },
+        { empId: 'EMP1003', name: 'Dr. Vijay Patel', desig: 'Associate Professor', dept: 'Electronics & Communication' }
+      ],
+      attendance: [
+        { date: '2026-07-01', status: 'PRESENT' },
+        { date: '2026-07-02', status: 'PRESENT' },
+        { date: '2026-07-03', status: 'ABSENT' },
+        { date: '2026-07-04', status: 'PRESENT' },
+        { date: '2026-07-05', status: 'PRESENT' },
+        { date: '2026-07-07', status: 'PRESENT' },
+        { date: '2026-07-08', status: 'PRESENT' },
+        { date: '2026-07-09', status: 'ABSENT' },
+        { date: '2026-07-10', status: 'PRESENT' },
+        { date: '2026-07-11', status: 'PRESENT' },
+        { date: '2026-07-12', status: 'PRESENT' },
+        { date: '2026-07-14', status: 'ABSENT' },
+        { date: '2026-07-15', status: 'PRESENT' },
+        { date: '2026-07-16', status: 'PRESENT' },
+        { date: '2026-07-17', status: 'PRESENT' },
+        { date: '2026-07-18', status: 'PRESENT' },
+        { date: '2026-07-19', status: 'ABSENT' },
+        { date: '2026-07-21', status: 'PRESENT' },
+        { date: '2026-07-22', status: 'PRESENT' },
+        { date: '2026-07-23', status: 'PRESENT' },
+        { date: '2026-07-24', status: 'ABSENT' },
+        { date: '2026-07-25', status: 'PRESENT' },
+        { date: '2026-07-26', status: 'PRESENT' },
+        { date: '2026-06-02', status: 'PRESENT' },
+        { date: '2026-06-03', status: 'PRESENT' },
+        { date: '2026-06-04', status: 'ABSENT' },
+        { date: '2026-06-05', status: 'PRESENT' },
+        { date: '2026-06-06', status: 'PRESENT' },
+        { date: '2026-06-09', status: 'PRESENT' },
+        { date: '2026-06-10', status: 'ABSENT' },
+        { date: '2026-06-11', status: 'PRESENT' },
+        { date: '2026-06-12', status: 'PRESENT' },
+        { date: '2026-06-13', status: 'PRESENT' },
+        { date: '2026-06-16', status: 'PRESENT' },
+        { date: '2026-06-17', status: 'ABSENT' },
+        { date: '2026-06-18', status: 'PRESENT' },
+        { date: '2026-06-19', status: 'PRESENT' },
+        { date: '2026-06-20', status: 'PRESENT' },
+        { date: '2026-06-23', status: 'PRESENT' },
+        { date: '2026-06-24', status: 'PRESENT' },
+        { date: '2026-06-25', status: 'ABSENT' },
+        { date: '2026-06-26', status: 'PRESENT' },
+        { date: '2026-06-27', status: 'PRESENT' }
+      ],
+      marks: [
+        { subject: 'Software Architecture & Design', exam: 'Internal Mid-Term', score: 85, max: 100 },
+        { subject: 'Applied Advanced Statistics', exam: 'Internal Mid-Term', score: 92, max: 100 },
+        { subject: 'Database Management Systems', exam: 'Internal Mid-Term', score: 78, max: 100 },
+        { subject: 'Computer Networks', exam: 'Internal Mid-Term', score: 88, max: 100 },
+        { subject: 'Operating Systems', exam: 'Internal Mid-Term', score: 74, max: 100 }
+      ],
+      payments: [
+        { invoice: 'INV-2026-01', amount: 3500.00, cat: 'TUITION', method: 'UPI', status: 'SUCCESS' },
+        { invoice: 'INV-2026-02', amount: 1500.00, cat: 'HOSTEL', method: 'CARD', status: 'SUCCESS' }
+      ],
+      library: [
+        { title: 'Introduction to Algorithms', author: 'Cormen, Leiserson', isbn: '978-0262033848', status: 'Available' },
+        { title: 'Computer Networking', author: 'Kurose, Ross', isbn: '978-0133594140', status: 'Issued' }
+      ],
+      complaints: [
+        { title: 'Laboratory Network Down', desc: 'The switches in Lab-B are unpowered.', status: 'PENDING', resolution: '-' }
+      ]
+    };
+
+    function showLogin() {
+      document.getElementById('landing-page').classList.add('hidden');
+      document.getElementById('login-page').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function togglePasswordVis() {
+      const field = document.getElementById('login-password');
+      const icon = document.getElementById('password-eye-icon');
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        field.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    function quickFill(email, role) {
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = 'password123';
+      document.getElementById('login-role').value = role;
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const selectedRole = document.getElementById('login-role').value;
+      
+      let role = selectedRole;
+      let name = 'Arjun Sharma';
+      if (role === 'ADMIN') name = 'Rajesh Kumar (Admin)';
+      else if (role === 'FACULTY') name = 'Dr. Ramesh Krishnan';
+      else if (role === 'PARENT') name = 'Suresh Sharma (Parent)';
+
+      currentUser = { email, role, name };
+      
+      document.getElementById('login-page').classList.add('hidden');
+      document.getElementById('erp-portal').classList.remove('hidden');
+
+      document.getElementById('user-display-name').innerText = currentUser.name;
+      document.getElementById('user-display-role').innerText = currentUser.role;
+      const initial = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
+      document.getElementById('user-avatar-initial').innerText = initial;
+
+      renderSidebar();
+      setTab('dashboard');
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      document.getElementById('erp-portal').classList.add('hidden');
+      document.getElementById('landing-page').classList.remove('hidden');
+    }
+
+    // ── STUDENT DASHBOARD TOGGLE STATE ──────────────────────────────────
+    let activeStudentCard = null;
+
+    function toggleStudentCard(cardId) {
+      const panel = document.getElementById('student-detail-panel');
+      if (!panel) return;
+      if (activeStudentCard === cardId) {
+        // Close
+        activeStudentCard = null;
+        panel.style.maxHeight = '0';
+        panel.style.opacity = '0';
+        panel.style.padding = '0';
+        panel.style.border = 'none';
+        setTimeout(() => { panel.innerHTML = ''; }, 300);
+        // Reset card borders
+        ['card-attendance','card-marks','card-fee','card-library'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) { el.classList.remove('ring-2','ring-primary','ring-blue-400','ring-green-400','ring-yellow-400','ring-purple-400'); }
+        });
+        return;
+      }
+      activeStudentCard = cardId;
+      // Highlight active card
+      ['card-attendance','card-marks','card-fee','card-library'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('ring-2','ring-primary','ring-blue-400','ring-green-400','ring-yellow-400','ring-purple-400');
+      });
+      const activeEl = document.getElementById(cardId);
+      if (activeEl) {
+        if (cardId==='card-attendance') activeEl.classList.add('ring-2','ring-green-400');
+        else if (cardId==='card-marks')      activeEl.classList.add('ring-2','ring-blue-400');
+        else if (cardId==='card-fee')        activeEl.classList.add('ring-2','ring-yellow-400');
+        else if (cardId==='card-library')    activeEl.classList.add('ring-2','ring-purple-400');
+      }
+
+      let html = '';
+
+      if (cardId === 'card-attendance') {
+        // Build monthly calendar for July and June 2026
+        const months = [
+          { year: 2026, month: 6, name: 'June 2026' },
+          { year: 2026, month: 7, name: 'July 2026' }
+        ];
+        const attMap = {};
+        db.attendance.forEach(a => { attMap[a.date] = a.status; });
+
+        const calHtml = months.map(m => {
+          const daysInMonth = new Date(m.year, m.month, 0).getDate();
+          const firstDay = new Date(m.year, m.month - 1, 1).getDay(); // 0=Sun
+          const presentDays = db.attendance.filter(a => {
+            const [y,mo] = a.date.split('-').map(Number);
+            return y === m.year && mo === m.month && a.status === 'PRESENT';
+          }).length;
+          const totalDays = db.attendance.filter(a => {
+            const [y,mo] = a.date.split('-').map(Number);
+            return y === m.year && mo === m.month;
+          }).length;
+
+          let cells = '';
+          // Empty cells for offset
+          for (let d = 0; d < firstDay; d++) cells += '<div></div>';
+          for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${m.year}-${String(m.month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const status = attMap[dateStr];
+            let cls = 'w-8 h-8 rounded-lg flex items-center justify-center text-xs font-semibold ';
+            if (status === 'PRESENT') cls += 'bg-green-100 text-green-700';
+            else if (status === 'ABSENT') cls += 'bg-red-100 text-red-600';
+            else cls += 'bg-gray-50 text-gray-300';
+            cells += `<div class="${cls}" title="${dateStr}: ${status||'No class'}">${d}</div>`;
+          }
+          return `
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold text-gray-700">${m.name}</h4>
+                <span class="text-[10px] font-semibold ${presentDays/totalDays>=0.75?'text-green-600':'text-red-500'}">${presentDays}/${totalDays} days present</span>
+              </div>
+              <div class="grid grid-cols-7 gap-1 text-center">
+                ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div class="text-[10px] font-bold text-gray-400">${d}</div>`).join('')}
+                ${cells}
+              </div>
+            </div>
+          `;
+        }).join('<div class="border-t border-gray-100"></div>');
+
+        const totalPresent = db.attendance.filter(a=>a.status==='PRESENT').length;
+        const totalClasses = db.attendance.length;
+        const overallPct = Math.round(totalPresent/totalClasses*100);
+        html = `
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="calendar-check" class="w-4 h-4 text-green-500"></i>
+                <h3 class="text-sm font-bold text-gray-800">Monthly Attendance Report</h3>
+              </div>
+              <div class="flex items-center gap-3 text-[11px] font-semibold">
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-100 inline-block"></span>Present</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-100 inline-block"></span>Absent</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-50 border inline-block"></span>No Class</span>
+              </div>
+            </div>
+            <!-- Overall progress -->
+            <div class="p-3 bg-slate-50 rounded-xl flex items-center gap-4">
+              <div class="text-center">
+                <p class="text-2xl font-bold ${overallPct>=75?'text-green-600':'text-red-500'}">${overallPct}%</p>
+                <p class="text-[9px] text-gray-400 font-semibold uppercase">Overall</p>
+              </div>
+              <div class="flex-1">
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" style="width:${overallPct}%;background:${overallPct>=75?'#22c55e':'#ef4444'}"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                  <span>${totalPresent} Present</span><span>${totalClasses-totalPresent} Absent</span><span>${totalClasses} Total</span>
+                </div>
+              </div>
+              <span class="text-xs font-bold px-3 py-1 rounded-full ${overallPct>=75?'bg-green-50 text-green-700':'bg-red-50 text-red-600'}">${overallPct>=75?'✓ On Track':'⚠ Below Min'}</span>
+            </div>
+            <!-- Calendars -->
+            <div class="grid lg:grid-cols-2 gap-5">${calHtml}</div>
+          </div>
+        `;
+      }
+
+      else if (cardId === 'card-marks') {
+        const rows = db.marks.map(m => {
+          const pct = Math.round(m.score/m.max*100);
+          const grade = pct>=90?'A+':pct>=80?'A':pct>=70?'B+':pct>=60?'B':'C';
+          const color = pct>=80?'text-green-600':pct>=65?'text-yellow-600':'text-red-500';
+          const barColor = pct>=80?'#22c55e':pct>=65?'#f59e0b':'#ef4444';
+          return `
+            <div class="flex items-center gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-xs font-semibold text-gray-700 truncate max-w-[200px]">${m.subject}</span>
+                  <div class="flex items-center gap-2 ml-2 flex-shrink-0">
+                    <span class="text-xs font-bold text-gray-900">${m.score}/${m.max}</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${pct>=80?'bg-green-50 text-green-700':pct>=65?'bg-yellow-50 text-yellow-700':'bg-red-50 text-red-600'}">${grade}</span>
+                  </div>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" style="width:${pct}%;background:${barColor}"></div>
+                </div>
+                <p class="text-[10px] text-gray-400 mt-0.5">${m.exam}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+        const avg = Math.round(db.marks.reduce((s,m)=>s+m.score,0)/db.marks.length);
+        html = `
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="award" class="w-4 h-4 text-blue-500"></i>
+                <h3 class="text-sm font-bold text-gray-800">Subject-wise Marks Breakdown</h3>
+              </div>
+              <div class="text-right">
+                <span class="text-lg font-bold text-gray-900">${avg}/100</span>
+                <p class="text-[10px] text-gray-400">Semester Average</p>
+              </div>
+            </div>
+            <div class="space-y-3">${rows}</div>
+          </div>
+        `;
+      }
+
+      else if (cardId === 'card-fee') {
+        const rows = db.payments.map(p => `
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-yellow-50 text-warning flex items-center justify-center">
+                <i data-lucide="receipt" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-gray-800">${p.invoice}</p>
+                <p class="text-[10px] text-gray-400">${p.cat} &middot; ${p.method}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-bold text-gray-900">&#8377;${p.amount.toLocaleString('en-IN')}</p>
+              <span class="text-[10px] font-bold ${p.status==='SUCCESS'?'text-green-600':'text-red-500'}">${p.status}</span>
+            </div>
+          </div>
+        `).join('');
+        const total = db.payments.reduce((s,p)=>s+p.amount,0);
+        html = `
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="credit-card" class="w-4 h-4 text-yellow-500"></i>
+              <h3 class="text-sm font-bold text-gray-800">Fee Payment History</h3>
+              <span class="ml-auto text-xs font-bold text-gray-700">Total: &#8377;${total.toLocaleString('en-IN')}</span>
+            </div>
+            ${rows}
+            <div class="p-3 bg-green-50 rounded-xl flex items-center gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+              <span class="text-xs font-semibold text-green-700">All dues cleared &mdash; No pending payments</span>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (cardId === 'card-library') {
+        const rows = db.library.map(b => `
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center">
+                <i data-lucide="book" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-gray-800">${b.title}</p>
+                <p class="text-[10px] text-gray-400">${b.author} &middot; ISBN: ${b.isbn}</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${b.status==='Available'?'bg-green-50 text-green-700':'bg-red-50 text-red-500'}">${b.status}</span>
+          </div>
+        `).join('');
+        html = `
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="book-open" class="w-4 h-4 text-purple-500"></i>
+              <h3 class="text-sm font-bold text-gray-800">Library Catalog</h3>
+              <span class="ml-auto text-[10px] text-gray-400">${db.library.filter(b=>b.status==='Available').length} of ${db.library.length} available</span>
+            </div>
+            ${rows}
+          </div>
+        `;
+      }
+
+      panel.innerHTML = html;
+      panel.style.maxHeight = '600px';
+      panel.style.opacity = '1';
+      panel.style.padding = '20px';
+      panel.style.border = '1px solid #e5e7eb';
+      lucide.createIcons();
+    }
+
+    function getRoleBadgeClass(role) {
+      const map = { STUDENT: 'role-badge-student', FACULTY: 'role-badge-faculty', ADMIN: 'role-badge-admin', PARENT: 'role-badge-parent' };
+      return map[role] || 'role-badge-student';
+    }
+
+    function renderSidebar() {
+      const nav = document.getElementById('sidebar-nav');
+      const profileEl = document.getElementById('sidebar-profile');
+      let links = [];
+
+      // Render profile mini card
+      profileEl.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+            ${currentUser.name.charAt(0).toUpperCase()}
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-semibold text-gray-800 truncate">${currentUser.name}</p>
+            <span class="role-badge ${getRoleBadgeClass(currentUser.role)}">${currentUser.role}</span>
+          </div>
+        </div>
+      `;
+
+      if (currentUser.role === 'ADMIN') {
+        links = [
+          { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+          { id: 'students', label: 'Student Directory', icon: 'users' },
+          { id: 'faculty', label: 'Faculty Roster', icon: 'graduation-cap' },
+          { id: 'departments', label: 'Departments', icon: 'building-2' },
+          { id: 'fees', label: 'Finance & Fees', icon: 'credit-card' },
+          { id: 'complaints', label: 'Support Tickets', icon: 'ticket' }
+        ];
+      } else if (currentUser.role === 'FACULTY') {
+        links = [
+          { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+          { id: 'attendance', label: 'Record Attendance', icon: 'check-square' },
+          { id: 'marks', label: 'Enter Exam Marks', icon: 'pen-tool' },
+          { id: 'assignments', label: 'Class Tasks', icon: 'clipboard-list' }
+        ];
+      } else if (currentUser.role === 'STUDENT') {
+        links = [
+          { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+          { id: 'attendance', label: 'Attendance Logs', icon: 'check-square' },
+          { id: 'marks', label: 'Grades & Marks', icon: 'award' },
+          { id: 'fees', label: 'Pay Dues', icon: 'credit-card' },
+          { id: 'library', label: 'Library Catalog', icon: 'book-open' },
+          { id: 'complaints', label: 'Support Ticket', icon: 'ticket' }
+        ];
+      } else if (currentUser.role === 'PARENT') {
+        links = [
+          { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+          { id: 'attendance', label: 'Attendance Log', icon: 'check-square' },
+          { id: 'marks', label: 'Grades Record', icon: 'award' }
+        ];
+      }
+
+      nav.innerHTML = links.map(l => `
+        <button onclick="setTab('${l.id}')" id="nav-btn-${l.id}" class="nav-item">
+          <i data-lucide="${l.icon}" class="w-4 h-4 flex-shrink-0"></i>
+          <span>${l.label}</span>
+        </button>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    const tabTitles = {
+      dashboard: 'Dashboard Overview',
+      students: 'Student Directory',
+      faculty: 'Faculty Roster',
+      departments: 'Departments',
+      fees: 'Finance & Fees',
+      complaints: 'Support Tickets',
+      attendance: 'Attendance Records',
+      marks: 'Grades & Marks',
+      assignments: 'Class Assignments',
+      library: 'Library Catalog'
+    };
+
+    function setTab(tabId) {
+      currentTab = tabId;
+      document.getElementById('navbar-title').innerText = tabTitles[tabId] || tabId;
+
+      // Highlight active nav item
+      document.querySelectorAll('#sidebar-nav button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      const activeBtn = document.getElementById(`nav-btn-${tabId}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Animate content swap
+      const container = document.getElementById('content-container');
+      container.classList.remove('fade-in');
+      void container.offsetWidth; // force reflow
+      container.classList.add('fade-in');
+
+      renderContent();
+    }
+
+    // Shared notifications data
+    const sharedNotifications = [
+      { icon: 'bell', color: 'text-blue-500', bg: 'bg-blue-50', msg: 'Mid-term examination schedule published.', time: '2 hrs ago' },
+      { icon: 'alert-triangle', color: 'text-yellow-500', bg: 'bg-yellow-50', msg: 'Fee payment deadline: July 15, 2026.', time: '5 hrs ago' },
+      { icon: 'check-circle', color: 'text-green-500', bg: 'bg-green-50', msg: 'Lab assignment grades uploaded for CSE-101.', time: '1 day ago' },
+      { icon: 'info', color: 'text-indigo-500', bg: 'bg-indigo-50', msg: 'Campus holiday: July 10 (Annual Sports Day).', time: '2 days ago' }
+    ];
+
+    function notificationsWidget() {
+      return `
+        <div class="erp-card">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="bell" class="w-4 h-4 text-primary"></i>
+              <h3 class="text-sm font-bold text-gray-800">Recent Notifications</h3>
+            </div>
+            <span class="text-[10px] text-gray-400 font-medium">Today</span>
+          </div>
+          <div class="space-y-2">
+            ${sharedNotifications.map(n => `
+              <div class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-default">
+                <div class="w-7 h-7 rounded-lg ${n.bg} ${n.color} flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="${n.icon}" class="w-3.5 h-3.5"></i>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-xs text-gray-700 leading-snug">${n.msg}</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">${n.time}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderContent() {
+      const container = document.getElementById('content-container');
+      
+      // ================== ADMIN VIEWS ==================
+      if (currentUser.role === 'ADMIN') {
+        if (currentTab === 'dashboard') {
+          const presentCount = db.attendance.filter(a => a.status === 'PRESENT').length;
+          const attendancePct = Math.round((presentCount / db.attendance.length) * 100);
+          container.innerHTML = `
+            <div class="space-y-5">
+              <!-- Welcome bar -->
+              <div class="erp-card flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-gray-900">Welcome back, ${currentUser.name} 👋</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">System Administrator &mdash; Full Access</p>
+                </div>
+                <span class="role-badge role-badge-admin text-sm px-3 py-1">ADMIN</span>
+              </div>
+
+              <!-- Stat cards -->
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Total Students</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">500</p>
+                    <p class="text-[10px] text-green-500 font-semibold mt-0.5">+12 this month</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Faculty Roster</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">60</p>
+                    <p class="text-[10px] text-green-500 font-semibold mt-0.5">+2 this month</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-emerald-50 text-secondary flex items-center justify-center">
+                    <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Total Revenue</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">&#8377;45,200</p>
+                    <p class="text-[10px] text-green-500 font-semibold mt-0.5">+8% vs last semester</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-yellow-50 text-warning flex items-center justify-center">
+                    <i data-lucide="indian-rupee" class="w-5 h-5"></i>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Departments</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">${db.departments.length}</p>
+                    <p class="text-[10px] text-gray-400 font-semibold mt-0.5">Active faculties</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center">
+                    <i data-lucide="building-2" class="w-5 h-5"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick actions + notifications -->
+              <div class="grid lg:grid-cols-2 gap-5">
+                <div class="erp-card space-y-4">
+                  <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-4 h-4 text-primary"></i> Add Department
+                  </h3>
+                  <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="new-dept-name" placeholder="Department Name" class="h-9 px-3 text-xs bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"/>
+                    <input type="text" id="new-dept-code" placeholder="Code (e.g. CSE)" class="h-9 px-3 text-xs bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"/>
+                  </div>
+                  <button onclick="addDepartment()" class="px-4 h-9 text-xs font-semibold text-white bg-primary rounded-lg hover:bg-blue-700 transition-colors">Save Department</button>
+                </div>
+                ${notificationsWidget()}
+              </div>
+            </div>
+          `;
+        } else if (currentTab === 'students') {
+          container.innerHTML = `
+            <div class="erp-card overflow-hidden p-0">
+              <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4 text-primary"></i>
+                <h3 class="text-sm font-bold text-gray-800">Student Directory</h3>
+                <span class="ml-auto text-[10px] text-gray-400">${db.students.length} records</span>
+              </div>
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-slate-50 border-b border-gray-100 text-gray-500 font-semibold">
+                  <th class="px-5 py-3">Roll No</th>
+                  <th class="px-5 py-3">Name</th>
+                  <th class="px-5 py-3">Department</th>
+                  <th class="px-5 py-3">Phone</th>
+                </tr>
+                ${db.students.map(s => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100 transition-colors">
+                    <td class="px-5 py-3 font-mono font-bold text-primary text-[11px]">${s.rollNumber}</td>
+                    <td class="px-5 py-3 font-medium text-gray-800">${s.name}</td>
+                    <td class="px-5 py-3 text-gray-500">${s.dept}</td>
+                    <td class="px-5 py-3 text-gray-400">${s.phone}</td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        } else if (currentTab === 'faculty') {
+          container.innerHTML = `
+            <div class="erp-card overflow-hidden p-0">
+              <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+                <i data-lucide="graduation-cap" class="w-4 h-4 text-secondary"></i>
+                <h3 class="text-sm font-bold text-gray-800">Faculty Roster</h3>
+              </div>
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-slate-50 border-b border-gray-100 text-gray-500 font-semibold">
+                  <th class="px-5 py-3">Emp ID</th>
+                  <th class="px-5 py-3">Name</th>
+                  <th class="px-5 py-3">Designation</th>
+                  <th class="px-5 py-3">Department</th>
+                </tr>
+                ${db.faculty.map(f => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100 transition-colors">
+                    <td class="px-5 py-3 font-mono font-bold text-secondary text-[11px]">${f.empId}</td>
+                    <td class="px-5 py-3 font-medium text-gray-800">${f.name}</td>
+                    <td class="px-5 py-3 text-gray-500">${f.desig}</td>
+                    <td class="px-5 py-3 text-gray-400">${f.dept}</td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        } else if (currentTab === 'departments') {
+          container.innerHTML = `
+            <div class="erp-card overflow-hidden p-0">
+              <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+                <i data-lucide="building-2" class="w-4 h-4 text-purple-500"></i>
+                <h3 class="text-sm font-bold text-gray-800">Departments</h3>
+              </div>
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-slate-50 border-b border-gray-100 text-gray-500 font-semibold">
+                  <th class="px-5 py-3">Code</th>
+                  <th class="px-5 py-3">Department Name</th>
+                  <th class="px-5 py-3">Capacity Stats</th>
+                </tr>
+                ${db.departments.map(d => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100 transition-colors">
+                    <td class="px-5 py-3 font-bold text-gray-800">${d.code}</td>
+                    <td class="px-5 py-3 font-medium text-gray-700">${d.name}</td>
+                    <td class="px-5 py-3 text-gray-400">${d.count}</td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        } else if (currentTab === 'fees') {
+          container.innerHTML = `
+            <div class="erp-card overflow-hidden p-0">
+              <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+                <i data-lucide="credit-card" class="w-4 h-4 text-warning"></i>
+                <h3 class="text-sm font-bold text-gray-800">Finance & Fees</h3>
+              </div>
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-slate-50 border-b border-gray-100 text-gray-500 font-semibold">
+                  <th class="px-5 py-3">Invoice No</th>
+                  <th class="px-5 py-3">Amount</th>
+                  <th class="px-5 py-3">Category</th>
+                  <th class="px-5 py-3">Status</th>
+                </tr>
+                ${db.payments.map(p => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100 transition-colors">
+                    <td class="px-5 py-3 font-mono text-gray-700">${p.invoice}</td>
+                    <td class="px-5 py-3 font-bold text-gray-900">&#8377;${p.amount}</td>
+                    <td class="px-5 py-3 text-gray-400 uppercase">${p.cat}</td>
+                    <td class="px-5 py-3"><span class="px-2 py-0.5 bg-green-50 text-success rounded-full text-[10px] font-bold">${p.status}</span></td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        } else if (currentTab === 'complaints') {
+          container.innerHTML = `
+            <div class="erp-card overflow-hidden p-0">
+              <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+                <i data-lucide="ticket" class="w-4 h-4 text-danger"></i>
+                <h3 class="text-sm font-bold text-gray-800">Support Tickets</h3>
+              </div>
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-slate-50 border-b border-gray-100 text-gray-500 font-semibold">
+                  <th class="px-5 py-3">Subject</th>
+                  <th class="px-5 py-3">Status</th>
+                  <th class="px-5 py-3">Action</th>
+                </tr>
+                ${db.complaints.map((c, i) => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100 transition-colors">
+                    <td class="px-5 py-3">
+                      <p class="font-medium text-gray-800">${c.title}</p>
+                      <p class="text-[10px] text-gray-400 mt-0.5">${c.desc}</p>
+                    </td>
+                    <td class="px-5 py-3"><span class="px-2 py-0.5 ${c.status === 'RESOLVED' ? 'bg-green-50 text-success' : 'bg-red-50 text-danger'} rounded-full text-[10px] font-bold">${c.status}</span></td>
+                    <td class="px-5 py-3">
+                      <button onclick="resolveComplaint(${i})" class="px-3 h-7 bg-green-50 text-success rounded-lg font-semibold text-[11px] border border-green-200 hover:bg-green-100 transition-colors">Resolve</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        }
+      }
+
+      // ================== FACULTY VIEWS ==================
+      else if (currentUser.role === 'FACULTY') {
+        if (currentTab === 'dashboard') {
+          container.innerHTML = `
+            <div class="space-y-5">
+              <!-- Welcome bar -->
+              <div class="erp-card flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-gray-900">Welcome, ${currentUser.name} 🎓</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">Department: Computer Science &amp; Engineering &mdash; B.Tech CSE</p>
+                </div>
+                <span class="role-badge role-badge-faculty text-sm px-3 py-1">FACULTY</span>
+              </div>
+
+              <!-- Stat cards -->
+              <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">My Students</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">${db.students.length}</p>
+                    <p class="text-[10px] text-gray-400 font-semibold mt-0.5">This semester</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Pending Marks</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">3</p>
+                    <p class="text-[10px] text-yellow-500 font-semibold mt-0.5">Awaiting upload</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-yellow-50 text-warning flex items-center justify-center">
+                    <i data-lucide="pen-tool" class="w-5 h-5"></i>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Assignments</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">2</p>
+                    <p class="text-[10px] text-gray-400 font-semibold mt-0.5">Active tasks</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center">
+                    <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Today's students + notifications -->
+              <div class="grid lg:grid-cols-2 gap-5">
+                <div class="erp-card">
+                  <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4 text-primary"></i> Student List
+                  </h3>
+                  <div class="space-y-2">
+                    ${db.students.map(s => `
+                      <div class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 transition-colors">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 text-primary flex items-center justify-center text-sm font-bold flex-shrink-0">${s.name.charAt(0)}</div>
+                        <div>
+                          <p class="text-xs font-semibold text-gray-800">${s.name}</p>
+                          <p class="text-[10px] text-gray-400">${s.rollNumber} &middot; ${s.dept}</p>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                ${notificationsWidget()}
+              </div>
+            </div>
+          `;
+        } else if (currentTab === 'attendance') {
+          container.innerHTML = `
+            <div class="bg-white border rounded-lg p-6 space-y-6">
+              <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="text-sm font-bold text-gray-900">Attendance Logger</h3>
+                <input type="date" value="2026-07-06" class="h-9 px-3 text-xs bg-slate-50 border rounded-md"/>
+              </div>
+              <div class="space-y-3">
+                ${db.students.map(s => `
+                  <div class="flex justify-between items-center text-xs">
+                    <div>
+                      <p class="font-bold">${s.name}</p>
+                      <p class="text-gray-400">${s.rollNumber}</p>
+                    </div>
+                    <div class="flex gap-2">
+                      <button type="button" class="px-3 py-1 bg-green-500 text-white rounded font-bold">Present</button>
+                      <button type="button" class="px-3 py-1 bg-gray-100 text-gray-500 rounded font-bold">Absent</button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <button onclick="alert('Attendance saved successfully')" class="px-4 h-9 text-xs font-semibold text-white bg-primary rounded-md">Save Logs</button>
+            </div>
+          `;
+        } else if (currentTab === 'marks') {
+          container.innerHTML = `
+            <div class="bg-white border rounded-lg p-6 max-w-md space-y-4">
+              <h3 class="text-sm font-bold text-gray-900">Exam Grades Input</h3>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-400 uppercase mb-1">Select Student</label>
+                <select class="w-full h-9 px-3 text-xs bg-slate-50 border rounded focus:outline-none">
+                  ${db.students.map(s => `<option>${s.name} (${s.rollNumber})</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-400 uppercase mb-1">Enter Grade (obtained / 100)</label>
+                <input type="number" placeholder="e.g. 85" class="w-full h-9 px-3 text-xs bg-slate-50 border rounded focus:outline-none"/>
+              </div>
+              <button onclick="alert('Grades submitted')" class="px-4 h-9 text-xs font-semibold text-white bg-primary rounded-md">Submit Marks</button>
+            </div>
+          `;
+        } else if (currentTab === 'assignments') {
+          container.innerHTML = `
+            <div class="bg-white border rounded-lg p-6 max-w-md space-y-4">
+              <h3 class="text-sm font-bold text-gray-900">Create New Assignment Sheet</h3>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-400 uppercase mb-1">Task Title</label>
+              <button onclick="alert('Assignment task published')" class="px-4 h-9 text-xs font-semibold text-white bg-primary rounded-md">Publish Assignment</button>
+            </div>
+          `;
+        }
+      }
+
+      // ================== STUDENT VIEWS ==================
+      else if (currentUser.role === 'STUDENT') {
+        if (currentTab === 'dashboard') {
+          const presentCount = db.attendance.filter(a => a.status === 'PRESENT').length;
+          const attendancePct = Math.round((presentCount / db.attendance.length) * 100);
+          const avgMark = Math.round(db.marks.reduce((s,m) => s + m.score, 0) / db.marks.length);
+          const feeStatus = db.payments.every(p => p.status === 'SUCCESS') ? 'Paid' : 'Pending';
+          container.innerHTML = `
+            <div class="space-y-5">
+              <!-- Welcome bar -->
+              <div class="erp-card flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-gray-900">Welcome back, ${currentUser.name} 📚</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">Roll: ROLL2026001 &middot; B.Tech Computer Science &amp; Engineering</p>
+                </div>
+                <span class="role-badge role-badge-student text-sm px-3 py-1">STUDENT</span>
+              </div>
+
+              <!-- Stat cards (clickable toggles) -->
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Attendance -->
+                <div id="card-attendance" onclick="toggleStudentCard('card-attendance')" class="stat-card cursor-pointer select-none transition-all duration-200">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Attendance</span>
+                    <p class="text-2xl font-bold ${attendancePct >= 75 ? 'text-green-600' : 'text-red-500'} mt-1">${attendancePct}%</p>
+                    <p class="text-[10px] ${attendancePct >= 75 ? 'text-green-500' : 'text-red-400'} font-semibold mt-0.5">${attendancePct >= 75 ? 'Good standing' : 'Below 75%'}</p>
+                  </div>
+                  <div class="flex flex-col items-center gap-1">
+                    <div class="w-10 h-10 rounded-xl bg-green-50 text-success flex items-center justify-center">
+                      <i data-lucide="check-square" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-[9px] text-gray-400 font-semibold">tap to view</span>
+                  </div>
+                </div>
+                <!-- Avg Marks -->
+                <div id="card-marks" onclick="toggleStudentCard('card-marks')" class="stat-card cursor-pointer select-none transition-all duration-200">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Avg. Marks</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">${avgMark}/100</p>
+                    <p class="text-[10px] text-green-500 font-semibold mt-0.5">Above average</p>
+                  </div>
+                  <div class="flex flex-col items-center gap-1">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
+                      <i data-lucide="award" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-[9px] text-gray-400 font-semibold">tap to view</span>
+                  </div>
+                </div>
+                <!-- Fee Status -->
+                <div id="card-fee" onclick="toggleStudentCard('card-fee')" class="stat-card cursor-pointer select-none transition-all duration-200">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Fee Status</span>
+                    <p class="text-2xl font-bold ${feeStatus === 'Paid' ? 'text-green-600' : 'text-red-500'} mt-1">${feeStatus}</p>
+                    <p class="text-[10px] ${feeStatus === 'Paid' ? 'text-green-400' : 'text-red-400'} font-semibold mt-0.5">${feeStatus === 'Paid' ? 'No dues' : 'Action needed'}</p>
+                  </div>
+                  <div class="flex flex-col items-center gap-1">
+                    <div class="w-10 h-10 rounded-xl bg-yellow-50 text-warning flex items-center justify-center">
+                      <i data-lucide="credit-card" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-[9px] text-gray-400 font-semibold">tap to view</span>
+                  </div>
+                </div>
+                <!-- Library Books -->
+                <div id="card-library" onclick="toggleStudentCard('card-library')" class="stat-card cursor-pointer select-none transition-all duration-200">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Library Books</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">${db.library.length}</p>
+                    <p class="text-[10px] text-gray-400 font-semibold mt-0.5">${db.library.filter(l=>l.status==='Available').length} available</p>
+                  </div>
+                  <div class="flex flex-col items-center gap-1">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center">
+                      <i data-lucide="book-open" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-[9px] text-gray-400 font-semibold">tap to view</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Expandable detail panel (toggled by card clicks) -->
+              <div id="student-detail-panel"
+                class="erp-card overflow-hidden transition-all duration-300"
+                style="max-height:0;opacity:0;padding:0;border:none;">
+              </div>
+
+              <!-- AI Predictor + notifications -->
+              <div class="grid lg:grid-cols-2 gap-5">
+                <div class="erp-card space-y-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-indigo-600 font-bold text-sm">
+                      <i data-lucide="brain-circuit" class="w-4 h-4"></i>
+                      <span>AI Performance Predictor</span>
+                    </div>
+                    <button onclick="runAiPrediction()" class="px-3 h-8 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition-colors">Predict SGPA</button>
+                  </div>
+                  <div id="ai-predict-box" class="text-xs text-gray-400 leading-relaxed">
+                    Click <strong>Predict SGPA</strong> to run our AI classifier against your examination inputs and logs.
+                  </div>
+
+                  <!-- Marks progress -->
+                  <div class="pt-2 space-y-3 border-t border-gray-100">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Subject Performance</p>
+                    ${db.marks.map(m => `
+                      <div>
+                        <div class="flex justify-between text-xs mb-1">
+                          <span class="text-gray-700 font-medium truncate max-w-[180px]">${m.subject}</span>
+                          <span class="font-bold text-gray-900 ml-2">${m.score}/${m.max}</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                          <div class="progress-bar-fill" style="width:${Math.round(m.score/m.max*100)}%"></div>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                ${notificationsWidget()}
+              </div>
+            </div>
+          `;
+        } else if (currentTab === 'attendance') {
+          container.innerHTML = `
+            <div class="bg-white border rounded-lg overflow-hidden">
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 font-semibold">
+                  <th class="p-4">Date</th>
+                  <th class="p-4">Status</th>
+                </tr>
+                ${db.attendance.map(a => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100">
+                    <td class="p-4 font-medium">${a.date}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 ${a.status === 'PRESENT' ? 'bg-green-50 text-success' : 'bg-red-50 text-danger'} rounded text-[10px] font-bold">${a.status}</span></td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        } else if (currentTab === 'marks') {
+          container.innerHTML = `
+            <div class="bg-white border rounded-lg overflow-hidden">
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 font-semibold">
+                  <th class="p-4">Subject</th>
+                  <th class="p-4">Exam Scale</th>
+                  <th class="p-4">Score</th>
+                </tr>
+                ${db.marks.map(m => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100">
+                    <td class="p-4 font-medium">${m.subject}</td>
+                    <td class="p-4 text-gray-500">${m.exam}</td>
+                    <td class="p-4 font-bold text-gray-900">${m.score} / ${m.max}</td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        } else if (currentTab === 'fees') {
+          container.innerHTML = `
+            <div class="grid lg:grid-cols-3 gap-6">
+              <form onsubmit="simulatePayment(event)" class="p-5 bg-slate-50 border rounded-lg space-y-4 h-fit">
+                <h3 class="text-xs font-bold text-gray-900 uppercase">Tuition Checkout</h3>
+                <div>
+                  <label class="block text-[10px] font-semibold text-gray-500 mb-1">Enter Amount ($)</label>
+                  <input type="number" id="pay-amount" required placeholder="1500" class="w-full h-9 px-3 text-xs bg-white border rounded focus:outline-none"/>
+                </div>
+                <button type="submit" class="w-full h-9 text-xs font-semibold text-white bg-primary rounded hover:bg-primary-dark">Checkout Transaction</button>
+              </form>
+              <div class="lg:col-span-2 bg-white border rounded-lg overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                  <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 font-semibold">
+                    <th class="p-4">Invoice</th>
+                    <th class="p-4">Amount</th>
+                    <th class="p-4">Status</th>
+                  </tr>
+                  ${db.payments.map(p => `
+                    <tr class="hover:bg-slate-50 border-b border-gray-100">
+                      <td class="p-4 font-mono">${p.invoice}</td>
+                      <td class="p-4 font-bold">${p.amount}</td>
+                      <td class="p-4"><span class="px-2 py-0.5 bg-green-50 text-success rounded text-[10px] font-bold">${p.status}</span></td>
+                    </tr>
+                  `).join('')}
+                </table>
+              </div>
+            </div>
+          `;
+        } else if (currentTab === 'library') {
+          container.innerHTML = `
+            <div class="bg-white border rounded-lg overflow-hidden">
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 font-semibold">
+                  <th class="p-4">Title</th>
+                  <th class="p-4">Author</th>
+                  <th class="p-4">Availability</th>
+                </tr>
+                ${db.library.map(l => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100">
+                    <td class="p-4 font-medium">${l.title}</td>
+                    <td class="p-4 text-gray-500">${l.author}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 ${l.status === 'Available' ? 'bg-green-50 text-success' : 'bg-red-50 text-danger'} rounded text-[10px] font-bold">${l.status}</span></td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        } else if (currentTab === 'complaints') {
+          container.innerHTML = `
+            <form onsubmit="submitStudentComplaint(event)" class="bg-white border rounded-lg p-6 max-w-md space-y-4">
+              <h3 class="text-sm font-bold text-gray-900">Submit Help Desk Ticket</h3>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-400 mb-1">Ticket Subject</label>
+                <input type="text" id="comp-title" required placeholder="e.g. Wi-Fi connection issue in lab" class="w-full h-9 px-3 text-xs bg-slate-50 border rounded focus:outline-none"/>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-400 mb-1">Details</label>
+                <textarea id="comp-desc" required rows="4" placeholder="Explain the problem..." class="w-full p-3 text-xs bg-slate-50 border rounded focus:outline-none"></textarea>
+              </div>
+              <button type="submit" class="px-4 h-9 text-xs font-semibold text-white bg-primary rounded">Submit Complaint</button>
+            </form>
+          `;
+        }
+      }
+
+      // ================== PARENT VIEWS ==================
+      else if (currentUser.role === 'PARENT') {
+        if (currentTab === 'dashboard') {
+          const presentCount = db.attendance.filter(a => a.status === 'PRESENT').length;
+          const pct = Math.round((presentCount / db.attendance.length) * 100);
+          const avgMark = Math.round(db.marks.reduce((s,m) => s + m.score, 0) / db.marks.length);
+          container.innerHTML = `
+            <div class="space-y-5">
+              <!-- Welcome bar -->
+              <div class="erp-card flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-gray-900">Welcome, ${currentUser.name} 👪</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">Linked Student: Arjun Sharma &mdash; B.Tech CSE (ROLL2026001)</p>
+                </div>
+                <span class="role-badge role-badge-parent text-sm px-3 py-1">PARENT</span>
+              </div>
+
+              <!-- Stat cards -->
+              <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Attendance</span>
+                    <p class="text-2xl font-bold ${pct >= 75 ? 'text-green-600' : 'text-red-500'} mt-1">${pct}%</p>
+                    <p class="text-[10px] ${pct >= 75 ? 'text-green-500' : 'text-red-400'} font-semibold mt-0.5">${pct >= 75 ? 'On track' : 'Below minimum'}</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-green-50 text-success flex items-center justify-center">
+                    <i data-lucide="check-square" class="w-5 h-5"></i>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Avg. Marks</span>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">${avgMark}/100</p>
+                    <p class="text-[10px] text-green-500 font-semibold mt-0.5">Good performance</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
+                    <i data-lucide="award" class="w-5 h-5"></i>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Fee Status</span>
+                    <p class="text-2xl font-bold text-green-600 mt-1">Paid</p>
+                    <p class="text-[10px] text-green-400 font-semibold mt-0.5">No dues pending</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-yellow-50 text-warning flex items-center justify-center">
+                    <i data-lucide="credit-card" class="w-5 h-5"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Progress + notifications -->
+              <div class="grid lg:grid-cols-2 gap-5">
+                <div class="erp-card space-y-4">
+                  <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                    <i data-lucide="trending-up" class="w-4 h-4 text-primary"></i> Academic Progress
+                  </h3>
+                  ${db.marks.map(m => `
+                    <div>
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-700 font-medium">${m.subject}</span>
+                        <span class="font-bold text-gray-900">${m.score}/${m.max}</span>
+                      </div>
+                      <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width:${Math.round(m.score/m.max*100)}%"></div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+                ${notificationsWidget()}
+              </div>
+            </div>
+          `;
+        } else if (currentTab === 'attendance') {
+          container.innerHTML = `
+            <div class="bg-white border rounded-lg overflow-hidden">
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 font-semibold">
+                  <th class="p-4">Date</th>
+                  <th class="p-4">Status</th>
+                </tr>
+                ${db.attendance.map(a => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100">
+                    <td class="p-4 font-medium">${a.date}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 ${a.status === 'PRESENT' ? 'bg-green-50 text-success' : 'bg-red-50 text-danger'} rounded text-[10px] font-bold">${a.status}</span></td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        } else if (currentTab === 'marks') {
+          container.innerHTML = `
+            <div class="bg-white border rounded-lg overflow-hidden">
+              <table class="w-full text-left text-xs border-collapse">
+                <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 font-semibold">
+                  <th class="p-4">Subject</th>
+                  <th class="p-4">Exam Scale</th>
+                  <th class="p-4">Score</th>
+                </tr>
+                ${db.marks.map(m => `
+                  <tr class="hover:bg-slate-50 border-b border-gray-100">
+                    <td class="p-4 font-medium">${m.subject}</td>
+                    <td class="p-4 text-gray-500">${m.exam}</td>
+                    <td class="p-4 font-bold text-gray-900">${m.score} / ${m.max}</td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        }
+      }
+
+      lucide.createIcons();
+    }
+
+    // Dynamic state functions
+    function addDepartment() {
+      const name = document.getElementById('new-dept-name').value;
+      const code = document.getElementById('new-dept-code').value;
+      if (!name || !code) return;
+
+      db.departments.push({ name, code, count: '0 students / 0 faculty' });
+      document.getElementById('new-dept-name').value = '';
+      document.getElementById('new-dept-code').value = '';
+      alert('Department added successfully!');
+    }
+
+    function resolveComplaint(index) {
+      db.complaints[index].status = 'RESOLVED';
+      db.complaints[index].resolution = 'Addressed by Admin.';
+      alert('Complaint resolved successfully!');
+      renderContent();
+    }
+
+    function runAiPrediction() {
+      document.getElementById('ai-predict-box').innerHTML = `
+        <div class="p-4 bg-slate-50 border rounded-md text-slate-800 space-y-2 mt-2">
+          <p><strong>Predicted Semester GPA:</strong> <span class="text-indigo-600 font-bold text-sm">3.45 / 4.00</span></p>
+          <p><strong>Status:</strong> <span class="px-2 py-0.5 bg-green-100 text-success rounded text-[10px] font-bold">EXCELLENT</span></p>
+          <p><strong>Recommendations:</strong> Maintain current class work metrics. Current score averages project graduation with honors.</p>
+        </div>
+      `;
+    }
+
+    const erpKnowledgeBase = [
+      // Dashboard
+      { q: "purpose of the student dashboard", keywords: ["purpose", "student dashboard", "dashboard purpose"], a: "The Student Dashboard provides a summary of the student's academic information, such as attendance, marks, fee status, timetable, and notifications in one place." },
+      { q: "what information is displayed on the dashboard", keywords: ["information", "displayed", "dashboard"], a: "It displays attendance percentage, latest marks, upcoming exams, today's timetable, pending assignments, fee status, and recent notifications." },
+      { q: "what happens when a student logs in", keywords: ["happens", "student logs in", "login"], a: "The system authenticates the student's credentials, generates a JWT token, fetches the student's data from the database, and redirects the student to the dashboard." },
+      { q: "why is the dashboard important", keywords: ["why", "dashboard important", "importance of dashboard"], a: "It allows students to quickly view all important academic information without navigating through multiple pages." },
+      { q: "which database tables are mainly used for the dashboard", keywords: ["database tables", "used for the dashboard", "dashboard tables"], a: "Student, Attendance, Marks, Fees, Timetable, Notifications, and Assignments tables." },
+      // Profile
+      { q: "why does the student profile module exist", keywords: ["why", "profile module exist", "profile purpose"], a: "It stores the student's personal and academic details securely." },
+      { q: "what details can a student view", keywords: ["details", "student view", "view profile"], a: "Name, Roll Number, Register Number, Department, Semester, Email, Phone Number, Address, and Profile Picture." },
+      { q: "can students edit every field", keywords: ["edit every field", "edit profile"], a: "No. Only permitted fields such as phone number, address, and profile picture can be updated." },
+      { q: "why can't a student change the roll number", keywords: ["change the roll number", "roll number change"], a: "The Roll Number is a unique identifier assigned by the institution and should not be modified by students." },
+      { q: "which sql operation is used when updating the profile", keywords: ["sql", "updating", "profile update"], a: "UPDATE." },
+      // Attendance
+      { q: "what is the attendance module", keywords: ["what is", "attendance module"], a: "It allows students to view their attendance records for each subject." },
+      { q: "who marks attendance", keywords: ["who marks", "marks attendance"], a: "Faculty members mark attendance for students." },
+      { q: "can students modify attendance", keywords: ["modify attendance", "edit attendance"], a: "No. Students have read-only access." },
+      { q: "how is attendance percentage calculated", keywords: ["percentage", "calculated", "attendance percentage"], a: "(Present Days ÷ Total Working Days) × 100." },
+      { q: "which sql operation is used to display attendance", keywords: ["sql", "display", "attendance sql"], a: "SELECT." },
+      // Attendance Percentage
+      { q: "why is attendance percentage displayed", keywords: ["why", "percentage displayed", "attendance percentage"], a: "It helps students know whether they meet the minimum attendance requirement." },
+      { q: "what happens if attendance is below the required percentage", keywords: ["below the required", "attendance shortage", "shortage"], a: "The student may receive a warning and could become ineligible for examinations, depending on institution rules." },
+      { q: "is attendance calculated automatically", keywords: ["calculated automatically", "automatic attendance"], a: "Yes. The system calculates it based on stored attendance records." },
+      { q: "which module provides attendance data", keywords: ["module provides", "attendance data"], a: "The Attendance module." },
+      { q: "which database table stores attendance", keywords: ["database table", "stores attendance", "attendance table"], a: "Attendance table." },
+      // Marks
+      { q: "what is the marks module", keywords: ["what is", "marks module"], a: "It allows students to view subject-wise examination marks." },
+      { q: "who uploads marks", keywords: ["who uploads", "uploads marks"], a: "Faculty members upload marks." },
+      { q: "can students edit marks", keywords: ["edit marks"], a: "No." },
+      { q: "which sql query is mainly used", keywords: ["sql query", "mainly used", "marks query"], a: "SELECT." },
+      { q: "why is this module important", keywords: ["why", "marks", "important"], a: "It helps students monitor their academic performance." },
+      // Internal Marks
+      { q: "what are internal marks", keywords: ["internal marks", "what are internal"], a: "They are marks awarded through assignments, tests, quizzes, and internal assessments." },
+      { q: "who updates internal marks", keywords: ["who updates", "internal updates"], a: "Faculty members." },
+      { q: "can students download internal marks", keywords: ["download internal", "download marks"], a: "Yes, if the download feature is provided." },
+      { q: "are internal marks included in final results", keywords: ["included in final", "internal results"], a: "Yes, according to the institution's evaluation policy." },
+      { q: "which table stores internal marks", keywords: ["table stores", "internal table"], a: "Internal_Marks table." },
+      // Semester Results
+      { q: "what is the semester results module", keywords: ["semester results module"], a: "It displays the student's semester examination results." },
+      { q: "what details are shown", keywords: ["details are shown", "semester results details"], a: "Subject Name, Marks, Grade, Credits, GPA, and CGPA." },
+      { q: "can results be modified by students", keywords: ["results", "modified", "students"], a: "No." },
+      { q: "who publishes semester results", keywords: ["publishes semester", "publish results"], a: "The examination administrator." },
+      { q: "which sql operation is used", keywords: ["sql", "semester results sql"], a: "SELECT." },
+      // Assignments
+      { q: "why is the assignment module useful", keywords: ["assignment module useful", "assignments useful"], a: "It allows students to view, submit, and track assignments." },
+      { q: "can students upload assignment files", keywords: ["upload assignment", "submit assignment"], a: "Yes." },
+      { q: "what file types are generally allowed", keywords: ["file types", "allowed file"], a: "PDF, DOCX, PPT, ZIP, and image files, depending on system settings." },
+      { q: "can students submit after the deadline", keywords: ["submit after the deadline"], a: "Normally no, unless faculty extends the deadline." },
+      { q: "which sql operations are used", keywords: ["sql", "assignments sql"], a: "INSERT and SELECT." },
+      // Study Materials
+      { q: "what is the study materials module", keywords: ["study materials module"], a: "It provides notes, presentations, PDFs, and reference materials uploaded by faculty." },
+      { q: "can students upload study materials", keywords: ["students upload study"], a: "No." },
+      { q: "who uploads study materials", keywords: ["uploads study materials"], a: "Faculty members." },
+      { q: "which sql operation is used", keywords: ["sql", "study materials sql"], a: "SELECT." },
+      { q: "why is this module useful", keywords: ["why", "study materials", "useful"], a: "Students can access learning resources anytime." },
+      // Enrolled Courses & Subjects
+      { q: "what is displayed in the courses module", keywords: ["displayed", "courses module"], a: "All courses enrolled by the student." },
+      { q: "can students change courses", keywords: ["change courses"], a: "No, unless permitted by the administrator." },
+      { q: "database table stores course information", keywords: ["database table", "stores course"], a: "Course table." },
+      { q: "sql operation is mainly used", keywords: ["sql", "courses sql"], a: "SELECT." },
+      { q: "why is this module important", keywords: ["why", "courses", "important"], a: "It helps students know their enrolled courses and subjects." },
+      { q: "what information is shown", keywords: ["information", "shown", "subjects information"], a: "Subject Code, Subject Name, Credits, and Faculty Name." },
+      { q: "who manages subjects", keywords: ["manages subjects"], a: "The administrator." },
+      { q: "can students edit subject information", keywords: ["edit subject information"], a: "No." },
+      { q: "sql operation is used", keywords: ["sql", "subjects sql"], a: "SELECT." },
+      { q: "why is this module useful", keywords: ["why", "subjects", "useful"], a: "Students can view subject details for their semester." },
+      // Timetable
+      { q: "what is the timetable module", keywords: ["what is", "timetable module"], a: "It displays the daily and weekly class schedule." },
+      { q: "who prepares the timetable", keywords: ["prepares the timetable"], a: "The administrator or timetable coordinator." },
+      { q: "can students edit the timetable", keywords: ["edit the timetable"], a: "No." },
+      { q: "sql operation is used", keywords: ["sql", "timetable sql"], a: "SELECT." },
+      { q: "why is the timetable important", keywords: ["why", "timetable", "important"], a: "It helps students attend classes on time." },
+      // Exam Schedule
+      { q: "what is shown in the exam schedule", keywords: ["shown", "exam schedule"], a: "Exam date, subject, time, and venue." },
+      { q: "who updates the schedule", keywords: ["updates", "schedule", "exam updates"], a: "The examination administrator." },
+      { q: "can students modify exam schedules", keywords: ["modify exam schedules"], a: "No." },
+      { q: "sql query is used", keywords: ["sql", "exam schedule sql"], a: "SELECT." },
+      { q: "why is this feature important", keywords: ["why", "exam schedule", "important"], a: "It helps students prepare and attend exams on the correct dates." },
+      // Fee Status
+      { q: "what is fee status", keywords: ["what is", "fee status"], a: "It displays the fee amount paid, balance due, and payment status." },
+      { q: "can students pay fees online", keywords: ["pay fees online"], a: "Yes, if online payment is integrated." },
+      { q: "sql operation is mainly used", keywords: ["sql", "fee status sql"], a: "SELECT." },
+      { q: "why is this module useful", keywords: ["why", "fee status", "useful"], a: "Students can track fee payments and dues." },
+      { q: "table stores fee information", keywords: ["table stores", "fee table"], a: "Fees table." },
+      // Notifications
+      { q: "what are notifications", keywords: ["what are", "notifications"], a: "They inform students about exams, events, holidays, assignments, and announcements." },
+      { q: "who sends notifications", keywords: ["who sends", "notifications sender"], a: "The administrator or faculty." },
+      { q: "can students delete notifications", keywords: ["delete notifications"], a: "Usually, they can mark them as read but cannot delete them." },
+      { q: "sql operation is used", keywords: ["sql", "notifications sql"], a: "SELECT." },
+      { q: "why are notifications important", keywords: ["why", "notifications", "important"], a: "They keep students informed about important academic updates." },
+      // Logout
+      { q: "why is the logout feature necessary", keywords: ["why", "logout", "necessary"], a: "It securely ends the student's session." },
+      { q: "happens when logout is clicked", keywords: ["happens", "logout clicked", "logout behavior"], a: "The JWT token/session is invalidated or removed, and the student is redirected to the login page." },
+      { q: "why should students always log out", keywords: ["always log out", "why log out"], a: "To protect their account from unauthorized access." },
+      { q: "security concept is used here", keywords: ["security concept", "logout security"], a: "Session management and authentication." },
+      { q: "http method is commonly used", keywords: ["http method", "logout method"], a: "POST (or GET in some applications, though POST is preferred for logout actions)." },
+      // Studies & Research Questions
+      { q: "why do educational institutions implement erp systems", keywords: ["implement erp", "why erp", "institutions erp"], a: "Educational institutions implement ERP systems to centralize student information, automate administrative tasks, reduce paperwork, improve communication, and provide real-time access to academic records. Research shows that ERP systems improve operational efficiency and reduce manual errors." },
+      { q: "how does an erp system improve student performance", keywords: ["improve student performance", "improve performance", "student performance"], a: "ERP systems help students monitor attendance, marks, assignments, timetables, and exam schedules in one place. This improves time management, engagement, and academic planning, which can contribute to better performance." },
+      { q: "why is a student dashboard important", keywords: ["why", "dashboard important", "student dashboard importance"], a: "The dashboard provides quick access to attendance, grades, notifications, fee status, and assignments, helping students make informed academic decisions without searching through multiple systems." },
+      { q: "what is the biggest advantage of a centralized database", keywords: ["biggest advantage", "centralized database"], a: "A centralized database ensures that every department uses the same student information, reducing duplicate records, inconsistencies, and data redundancy." },
+      { q: "how does the attendance module help students", keywords: ["how", "attendance module help"], a: "Students can monitor their attendance percentage regularly, identify shortages early, and improve attendance before examinations." },
+      { q: "why should students have read-only access to marks", keywords: ["read-only access", "marks access"], a: "Marks are official academic records. Allowing students to edit them would compromise data integrity and security. Only authorized faculty members should update marks." },
+      { q: "why is role-based authentication important", keywords: ["role-based", "authentication important", "rbac"], a: "Role-based authentication ensures that students, faculty, parents, and administrators only access the information relevant to their responsibilities, improving security and protecting confidential data." },
+      { q: "what challenges do students face while using erp systems", keywords: ["challenges", "students face", "using erp"], a: "Research has found that students may initially struggle with learning the ERP interface, require training, and sometimes feel that more practice time is needed to become comfortable with the system." },
+      { q: "why is data validation necessary", keywords: ["data validation", "validation necessary"], a: "Validation prevents incorrect or incomplete information from being stored in the database. For example, email format, phone number length, and mandatory fields are checked before saving." },
+      { q: "how does the notification module improve communication", keywords: ["notification module improve", "communication erp"], a: "Notifications inform students about assignment deadlines, exams, fee due dates, holidays, and important announcements instantly, improving communication between the institution and students." },
+      { q: "why is jwt used in the project", keywords: ["jwt used", "why jwt", "jwt"], a: "JWT (JSON Web Token) provides secure authentication after login. Once authenticated, students can access authorized resources without repeatedly entering their credentials." },
+      { q: "what problem does the erp system solve compared to manual management", keywords: ["problem does", "solve", "manual management"], a: "Manual systems involve paper records, duplicate data, delays, and human errors. ERP digitizes these processes, making data retrieval faster, more accurate, and easier to manage." },
+
+      // ================= NEW UNIQUE QUESTIONS =================
+      { q: "how does the dashboard load personalized data", keywords: ["load personalized data", "load personalized"], a: "After login, the backend identifies the student (using the JWT token payload claims) and fetches their specific profile and academic records from the database." },
+      { q: "why is a dashboard better than separate pages", keywords: ["better than separate pages", "why dashboard better"], a: "It provides immediate quick access to critical, highly-requested summary information in one screen, reducing routing and search friction." },
+      { q: "how can dashboard performance be improved", keywords: ["performance be improved", "dashboard performance", "optimize dashboard"], a: "By implementing server caching, writing optimized relational SELECT queries, indexing foreign keys, and lazy-loading individual widget components." },
+      { q: "what happens if dashboard data cannot be loaded", keywords: ["cannot be loaded", "dashboard fails"], a: "The client displays a user-friendly error message or placeholder skeleton screen, and the backend exceptions are logged to the audit files." },
+      { q: "why can't students change their roll number", keywords: ["change roll number", "students change"], a: "Roll numbers are unique institutional identifiers." },
+      { q: "which profile fields can students update", keywords: ["profile fields can students update", "fields update"], a: "Typically non-academic records like contact phone numbers, current addresses, personal emails, and profile photographs." },
+      { q: "why is profile validation important", keywords: ["profile validation important", "why validation important"], a: "It prevents invalid, incomplete, or corrupted records (like wrong phone lengths or incorrect email patterns) from being committed to the database." },
+      { q: "how is profile data protected", keywords: ["profile data protected", "protect profile"], a: "JWT-based request authentication and strict resource ownership checks ensure that only the profile owner or administrator can modify details." },
+      { q: "what sql operation updates profile information", keywords: ["updates profile information", "sql updates profile"], a: "UPDATE." },
+      { q: "who is authorized to modify attendance records", keywords: ["modify attendance records", "authorized attendance"], a: "Only authorized faculty instructors or academic administrators have write access." },
+      { q: "why do students have read-only access to attendance", keywords: ["read-only access to attendance"], a: "To ensure academic integrity, prevent proxies, and protect official attendance statistics from tamper inputs." },
+      { q: "how are absent records stored", keywords: ["absent records stored", "absent stored"], a: "Absent logs are stored as database entries linking the student's foreign key, selected date, and marked status set to 'ABSENT'." },
+      { q: "what happens if attendance is not marked", keywords: ["attendance is not marked"], a: "The system defaults to a blank state for that session, and authorized faculty can retroactively log it using standard administration panels." },
+      { q: "who publishes examination marks", keywords: ["publishes examination marks", "publishes marks"], a: "Faculty members enter student grades, which are verified by the department heads and then published by the exam registrar." },
+      { q: "how does the system ensure marks accuracy", keywords: ["marks accuracy", "ensure marks"], a: "Using strict frontend range checks (e.g. score cannot exceed max marks), input validation middleware, and locking logs post-submission." },
+      { q: "can marks be edited after publication", keywords: ["marks be edited after publication", "marks edited after"], a: "Usually no. Any changes post-publication require official registrar overrides and register audit log entries." },
+      { q: "which sql operation retrieves marks", keywords: ["retrieves marks", "sql retrieves marks"], a: "SELECT." },
+      { q: "why are marks displayed subject-wise", keywords: ["marks displayed subject-wise", "subject-wise"], a: "It helps students evaluate performance indicators and identify specific courses where they need improvement." },
+      { q: "why are assignment deadlines enforced", keywords: ["assignment deadlines enforced", "deadlines enforced"], a: "To maintain structured academic schedules, ensure fair student assessment, and prevent grading backlogs for instructors." },
+      { q: "what happens after an assignment is submitted", keywords: ["after an assignment is submitted", "submitted assignment"], a: "The file is uploaded (to storage like Cloudinary or local disks), a database entry is created with submission timestamp, and faculty portals are updated." },
+      { q: "how can duplicate submissions be handled", keywords: ["duplicate submissions", "multiple submissions"], a: "The system handles it by either overwriting the old file in database records or saving version increments depending on settings." },
+      { q: "why is file validation required", keywords: ["file validation required", "why file validation"], a: "To restrict upload sizes and block dangerous executable extensions (like .exe, .sh) that pose security threats." },
+      { q: "which database table stores assignment submissions", keywords: ["table stores assignment submissions", "submissions table"], a: "An AssignmentSubmissions (or generic Assignment) table containing student references and uploaded URLs." },
+      { q: "who creates the timetable", keywords: ["creates the timetable", "timetable creator"], a: "Academic deans or designated timetable coordinators." },
+      { q: "why is conflict detection important", keywords: ["conflict detection", "timetable conflict"], a: "It programmatically prevents scheduling double-bookings for the same physical classroom, subject, faculty member, or student cohort." },
+      { q: "what information is shown in fee status", keywords: ["shown in fee status", "fee status information"], a: "Billed tuition, hostel/mess tallies, transport bus balances, due deadlines, and previous invoice history." },
+      { q: "how does online fee payment improve the system", keywords: ["online fee payment improve", "payment improve"], a: "It automates transaction matching, generates instant digital invoices, and reduces paper processing workloads." },
+      { q: "why are courses linked to semesters", keywords: ["courses linked to semesters", "linked to semesters"], a: "It organizes academic progression, ensuring students can select and view only the subjects relevant to their current term." },
+      { q: "can a student enroll in a course directly", keywords: ["enroll in a course directly", "student enroll course"], a: "No. Course allocations are managed by deans or administrative registrars during standard admission cycles." },
+      { q: "what details are displayed for each subject", keywords: ["details are displayed for each subject", "subject details"], a: "Subject code, academic credits, department syllabus name, semester term, and assigned faculty name." },
+      { q: "why are credits assigned to subjects", keywords: ["credits assigned to subjects", "why credits"], a: "Credits represent the academic weight and weekly lecture hours, acting as multipliers for GPA and CGPA calculations." },
+      { q: "why should exam schedules be published early", keywords: ["exam schedules be published early", "published early"], a: "It allows students enough preparation buffer time and helps out-of-town students plan logistics." },
+      { q: "what happens when the exam schedule changes", keywords: ["exam schedule changes"], a: "The database dates are modified, and automated notifications (emails, notice boards) are sent to students and faculty." },
+      { q: "how is gpa calculated", keywords: ["how is gpa calculated", "gpa calculation"], a: "GPA is calculated by dividing total grade points earned (Credit Weight × Grade Score) by the total number of credits attempted." },
+      { q: "why are results locked after publication", keywords: ["results locked after publication", "results locked"], a: "To secure institutional record integrity and prevent unauthorized grades manipulation." },
+      { q: "why should study materials be categorized by subject", keywords: ["study materials be categorized", "materials categorized"], a: "To make navigation intuitive, helping students find notes, slide decks, and reference guides efficiently." },
+      { q: "can students download study materials offline", keywords: ["download study materials offline", "materials offline"], a: "Yes. Materials can be downloaded in PDF or document format for offline study." },
+      { q: "why are push notifications useful", keywords: ["push notifications useful", "why push"], a: "They instantly catch user attention on screens, reducing delays in reading deadline alerts or emergencies." },
+      { q: "can students mark notifications as read", keywords: ["mark notifications as read", "notifications read"], a: "Yes. Marking notices as read hides them from active alert grids, improving clean UI navigation." },
+      { q: "what is the purpose of the events module", keywords: ["purpose of the events module", "events module purpose"], a: "To display institutional events, dates, locations, and guest lectures to keep students engaged." },
+      { q: "how do event reminders help students", keywords: ["event reminders help", "reminders help"], a: "Reminders reduce missing important academic, extracurricular, or physical campus events." },
+      { q: "why should strong passwords be enforced", keywords: ["strong passwords be enforced", "why strong passwords"], a: "To prevent brute-force entries, account compromises, and protect student information." },
+      { q: "what validations are applied while changing a password", keywords: ["validations are applied while changing a password", "changing password"], a: "Current password must match stored records, and the new password must meet length and complexity metrics." },
+      { q: "why should users log out on shared computers", keywords: ["users log out on shared", "shared computers"], a: "To prevent subsequent computer users from hijacking active browser sessions and editing details." },
+      { q: "why are rest apis used", keywords: ["why are rest apis used", "why rest"], a: "They provide scalable, standard, and stateless communication between Next.js clients and Express servers." },
+      { q: "why are foreign keys important", keywords: ["why are foreign keys important", "foreign keys"], a: "They enforce relational integrity, linking records across tables (like mapping a grade to a valid Student ID) and preventing orphaned rows." },
+      { q: "how does an erp system improve student experience", keywords: ["erp system improve student experience", "student experience"], a: "By centralizing administrative needs (finance, courses, grades) into a single, cohesive, self-service dashboard portal." },
+      { q: "how can database indexing improve student search performance", keywords: ["database indexing improve student search", "indexing improve"], a: "Indexes create quick lookup paths (e.g. on roll number), reducing full table scans and accelerating query times." },
+      { q: "why is pagination used in large student lists", keywords: ["pagination used in large", "why pagination"], a: "It loads database rows in smaller pages (e.g., 20 at a time), lowering server memory loads and network sizes." },
+      { q: "why should mandatory fields be validated on both frontend and backend", keywords: ["validated on both frontend and backend", "both frontend and backend"], a: "Frontend checks provide instant UI feedback; backend validation serves as a security check in case frontend scripts are bypassed." },
+      { q: "how is email uniqueness enforced", keywords: ["email uniqueness enforced", "unique email"], a: "Using UNIQUE constraints in the database schema (e.g. Prisma `@unique`) and performing verify lookups during sign-up." },
+      { q: "why should passwords be hashed instead of stored as plain text", keywords: ["hashed instead of stored", "why hash password"], a: "Hashing ensures that if the database is leaked, user passwords cannot be read. Hashing is a one-way cryptographic check." },
+      { q: "what is role-based authorization", keywords: ["what is role-based authorization", "rbac authorization"], a: "A security pattern ensuring users access only endpoints assigned to their role group (Admin, Student, Faculty, Parent)." },
+      { q: "why should apis return proper http status codes", keywords: ["apis return proper", "http status codes"], a: "They communicate the outcome of requests uniformly: 200 for OK, 400 for bad parameters, 401 for unauthorized, 500 for server bugs." },
+      { q: "what is the purpose of input sanitization", keywords: ["purpose of input sanitization", "sanitization"], a: "It cleans input values, stripping malicious tags to prevent XSS (Cross-Site Scripting) and SQL injection threats." },
+      { q: "why are transactions important when updating multiple tables", keywords: ["transactions important", "database transactions"], a: "They ensure 'All-or-Nothing' database changes, keeping tables consistent if a query fails midway." },
+      { q: "what is normalization", keywords: ["what is normalization", "normalization"], a: "Organizing database fields to minimize data duplication and isolate modifications cleanly." },
+      { q: "why is unit testing important", keywords: ["why is unit testing important", "unit testing"], a: "It checks individual functions or code sections in isolation to detect bugs early in developer builds." },
+      { q: "what is integration testing", keywords: ["what is integration testing", "integration testing"], a: "It verifies that distinct components (like Express controllers calling SQL tables via Prisma) interface correctly." },
+      { q: "why use a layered architecture", keywords: ["why use a layered architecture", "layered architecture"], a: "It divides systems into layers (routing, controller, business, database), making code maintenance, updates, and testing simple." },
+      { q: "what is the role of the service layer", keywords: ["role of the service layer", "service layer role"], a: "It encapsulates complex business logic and workflows, keeping controllers thin and focused on HTTP request/responses." },
+      { q: "what is a key challenge in erp implementation", keywords: ["key challenge in erp", "erp challenge"], a: "User adoption resistance, data migration complications, and change management requirements." },
+      { q: "how can erp improve communication", keywords: ["how can erp improve communication", "erp improve communication"], a: "By centralizing notice boards, messaging, alerts, and report sheets into one dashboard accessible by all roles." },
+      { q: "why should frequently accessed data be cached", keywords: ["frequently accessed data be cached", "caching"], a: "Caching avoids repeating expensive database reads, lowering server CPU loads and accelerating load times." },
+      { q: "why use environment-specific configuration files", keywords: ["environment-specific", "configuration files env"], a: "To separate local development databases from live production API keys and hosts safely." },
+      { q: "why are regular database backups necessary", keywords: ["regular database backups", "backups necessary"], a: "They guard against server failures, human errors, or database corruptions, facilitating quick system recovery." },
+      { q: "name one future enhancement for the student module", keywords: ["future enhancement for the student", "student enhancement"], a: "Integrating automated AI performance predictions or building biometric QR attendance systems." },
+      { q: "how can ai improve an erp student management system", keywords: ["how can ai improve", "ai improve erp"], a: "By predicting student failure risks early, offering smart chat assistants, and scheduling classroom slots automatically." },
+      { q: "why integrate biometric attendance", keywords: ["why integrate biometric", "biometric attendance"], a: "It eliminates manual attendance records, prevents proxy entries, and saves class instruction time." },
+      { q: "why develop a mobile app for the erp", keywords: ["develop a mobile app", "mobile app erp"], a: "It enables push notification alerts and allows students/parents to access tools on the move." },
+      { q: "what is the benefit of cloud deployment", keywords: ["benefit of cloud", "cloud deployment"], a: "Cloud hosts offer automatic system scaling, high server availability, and global access without physical hardware costs." },
+      { q: "how can analytics help students", keywords: ["analytics help students", "student analytics"], a: "Visual charts highlight study patterns, track attendance dips, and show performance metrics over semesters." },
+      { q: "why is student data privacy important", keywords: ["student data privacy important", "privacy important"], a: "To secure sensitive data (like contact numbers or grades) from identity theft or leaks." },
+      { q: "why should educational software follow data protection policies", keywords: ["follow data protection", "protection policies"], a: "To comply with national legal statutes (like FERPA or GDPR) and protect student information." },
+      { q: "why integrate email and sms services", keywords: ["integrate email and sms", "email and sms"], a: "To deliver alerts immediately for fee deadlines, attendance warnings, or class schedule adjustments." },
+      { q: "how does a chatbot help students", keywords: ["chatbot help students", "chatbot helper"], a: "It resolves simple informational requests instantly (like asking about exam schedules), lowering staff workloads." },
+      { q: "why should the erp be accessible", keywords: ["why should the erp be accessible", "erp accessible"], a: "To ensure that users with diverse abilities or screen-readers can navigate institutional tools seamlessly." },
+      { q: "why should the system support increasing users", keywords: ["support increasing users", "system scale"], a: "To ensure the server doesn't crash during peaks (like grades publication days) when user traffic surges." },
+      { q: "why is software maintenance important", keywords: ["software maintenance important", "maintenance important"], a: "To patch zero-day security vulnerabilities, optimize slow code paths, and update package dependencies." },
+      { q: "what is the biggest advantage of this erp project", keywords: ["biggest advantage of this erp", "project advantage"], a: "It integrates multiple administrative and academic tools into one single unified database platform." },
+      { q: "what did you learn from developing this project", keywords: ["learn from developing", "what did you learn"], a: "I learned database relation mapping, JWT security middleware design, responsive Tailwind styling, and ERP workflow business logic." },
+      { q: "why did you choose spring boot for this project", keywords: ["choose spring boot", "why spring boot"], a: "Spring Boot simplifies Java enterprise backend coding with modular dependencies, automated configuration wrappers, and robust Spring Security." }
+    ];
+
+    function sendAiChat(e) {
+      e.preventDefault();
+      const inputVal = document.getElementById('chat-input').value.trim();
+      if (!inputVal) return;
+
+      const chatBox = document.getElementById('chat-messages');
+      chatBox.innerHTML += `<div class="chat-user-msg">${inputVal}</div>`;
+
+      const text = inputVal.toLowerCase().trim();
+      let reply = null;
+
+      // ── STAGE 1: Exact question text match ──────────────────────────────────
+      for (const item of erpKnowledgeBase) {
+        if (text === item.q.toLowerCase() || text.includes(item.q.toLowerCase())) {
+          reply = item.a;
+          break;
+        }
+      }
+
+      // ── STAGE 2: Specific multi-word keyword match (only keywords 3+ words long) ──
+      if (!reply) {
+        let bestItem = null;
+        let bestLen = 0;
+        for (const item of erpKnowledgeBase) {
+          for (const kw of item.keywords) {
+            // Only use keywords that are at least 3 words (specific phrases)
+            if (kw.split(' ').length >= 3 && text.includes(kw)) {
+              if (kw.length > bestLen) {
+                bestLen = kw.length;
+                bestItem = item;
+              }
+            }
+          }
+        }
+        if (bestItem) reply = bestItem.a;
+      }
+
+      // ── STAGE 3: 2-word keyword match — pick the one with the longest matching phrase ──
+      if (!reply) {
+        let bestItem = null;
+        let bestLen = 0;
+        for (const item of erpKnowledgeBase) {
+          for (const kw of item.keywords) {
+            if (kw.split(' ').length === 2 && text.includes(kw)) {
+              // Extra guard: ensure the question text shares at least 4 more chars with input
+              const qWords = item.q.toLowerCase().split(' ');
+              const inputWords = text.split(' ');
+              const overlap = qWords.filter(w => w.length > 3 && inputWords.includes(w)).length;
+              if (overlap >= 2 && kw.length > bestLen) {
+                bestLen = kw.length;
+                bestItem = item;
+              }
+            }
+          }
+        }
+        if (bestItem) reply = bestItem.a;
+      }
+
+      // ── FALLBACK ─────────────────────────────────────────────────────────────
+      if (!reply) {
+        reply = "I couldn't find an exact answer for that. Try asking the full question — for example: \"How is attendance percentage calculated?\" or \"Why is JWT used in the project?\"";
+      }
+
+      setTimeout(() => {
+        chatBox.innerHTML += `<div class="chat-bot-msg">${reply}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        lucide.createIcons();
+      }, 150);
+
+      document.getElementById('chat-input').value = '';
+    }
+
+    function simulatePayment(e) {
+      e.preventDefault();
+      const amount = parseFloat(document.getElementById('pay-amount').value);
+      if (!amount) return;
+
+      db.payments.push({
+        invoice: 'INV-2026-0' + (db.payments.length + 1),
+        amount: amount,
+        cat: 'TUITION',
+        method: 'UPI',
+        status: 'SUCCESS'
+      });
+      document.getElementById('pay-amount').value = '';
+      alert('Checkout transaction successful! Invoice receipt logged.');
+      renderContent();
+    }
+
+    function submitStudentComplaint(e) {
+      e.preventDefault();
+      const title = document.getElementById('comp-title').value;
+      const desc = document.getElementById('comp-desc').value;
+      if (!title || !desc) return;
+
+      db.complaints.push({ title, desc, status: 'PENDING', resolution: '-' });
+      document.getElementById('comp-title').value = '';
+      document.getElementById('comp-desc').value = '';
+      alert('Complaint ticket successfully submitted.');
+      setTab('dashboard');
+    }
+  </script>
+</body>
+</html>
