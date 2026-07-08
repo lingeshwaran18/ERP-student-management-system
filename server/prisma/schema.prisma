@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -58,6 +58,7 @@ model Course {
   department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   subjects     Subject[]
   students     Student[]
+  timetable    Timetable[]
 }
 
 model Subject {
@@ -71,18 +72,25 @@ model Subject {
   faculty      Faculty?    @relation(fields: [facultyId], references: [id], onDelete: SetNull)
   assignments  Assignment[]
   marks        Mark[]
+  attendance   Attendance[]
+  timetable    Timetable[]
 }
 
 model Student {
-  id           String       @id @default(uuid())
-  userId       String       @unique
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  firstName    String
-  lastName     String
-  rollNumber   String       @unique
-  phone        String?
+  id            String       @id @default(uuid())
+  userId        String       @unique
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentId     String       @unique  // e.g. STU2026001 — used for login
+  firstName     String
+  lastName      String
+  rollNumber    String       @unique
+  phone         String?
+  photoUrl      String?
+  year          Int          @default(1)   // 1,2,3,4
+  semester      Int          @default(1)   // 1–8
+  section       String       @default("A")
   admissionDate DateTime     @default(now())
-  status       String       @default("ACTIVE") // ACTIVE, GRADUATED, SUSPENDED
+  status        String       @default("ACTIVE") // ACTIVE, GRADUATED, SUSPENDED
   
   departmentId String
   department   Department   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
@@ -98,6 +106,7 @@ model Student {
   results      Result[]
   payments     Payment[]
   libraryBooks LibraryBook[]
+  feeStructure FeeStructure?
   
   // Hostel & Transport Allocations
   hostelRoomId String?
@@ -135,6 +144,8 @@ model Attendance {
   id        String   @id @default(uuid())
   studentId String
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId String?
+  subject   Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   date      DateTime
   status    String   // PRESENT, ABSENT, LATE, EXCUSED
 }
@@ -171,97 +182,3 @@ model Mark {
 
 model Result {
   id         String   @id @default(uuid())
-  studentId  String
-  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  semester   String   // Semester e.g., "SEMESTER_1"
-  gpa        Float
-  cgpa       Float
-  passStatus String   // PASSED, FAILED
-}
-
-model Payment {
-  id             String   @id @default(uuid())
-  studentId      String
-  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  amount         Float
-  paymentDate    DateTime @default(now())
-  category       String   // TUITION, HOSTEL, TRANSPORT, EXAM, LIBRARY
-  status         String   // SUCCESS, PENDING, FAILED
-  paymentMethod  String   // CARD, NET_BANKING, UPI
-  invoiceNumber  String   @unique
-}
-
-model LibraryBook {
-  id          String   @id @default(uuid())
-  title       String
-  author      String
-  isbn        String   @unique
-  available   Boolean  @default(true)
-  borrowedById String?
-  borrowedBy  Student? @relation(fields: [borrowedById], references: [id], onDelete: SetNull)
-  dueDate     DateTime?
-}
-
-model HostelRoom {
-  id          String    @id @default(uuid())
-  roomNumber  String    @unique
-  blockName   String
-  capacity    Int       @default(4)
-  occupancy   Int       @default(0)
-  fee         Float
-  students    Student[]
-}
-
-model TransportRoute {
-  id            String    @id @default(uuid())
-  name          String    @unique
-  vehicleNumber String
-  driverName    String
-  fee           Float
-  students      Student[]
-}
-
-model Notification {
-  id           String   @id @default(uuid())
-  title        String
-  message      String
-  roleTarget   String   // ALL, ADMIN, STUDENT, FACULTY, PARENT
-  isRead       Boolean  @default(false)
-  createdAt    DateTime @default(now())
-}
-
-model Complaint {
-  id           String   @id @default(uuid())
-  title        String
-  description  String
-  status       String   @default("PENDING") // PENDING, RESOLVED, REJECTED
-  submittedBy  String   // User role or Email
-  resolution   String?
-  createdAt    DateTime @default(now())
-}
-
-model Event {
-  id          String   @id @default(uuid())
-  title       String
-  description String
-  date        DateTime
-  location    String
-}
-
-model Announcement {
-  id        String   @id @default(uuid())
-  title     String
-  content   String
-  date      DateTime @default(now())
-  postedBy  String   // e.g., "Administrator"
-}
-
-model AuditLog {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action    String
-  details   String
-  ipAddress String
-  timestamp DateTime @default(now())
-}
