@@ -136,6 +136,17 @@ export const getStudents = async (req: AuthenticatedRequest, res: Response) => {
       ];
     }
 
+    if (req.user?.role === 'FACULTY') {
+      const faculty = await prisma.faculty.findUnique({
+        where: { userId: req.user.id },
+        include: { subjects: { select: { courseId: true } } }
+      });
+      if (!faculty) return res.status(403).json({ error: 'Forbidden', message: 'Faculty profile not found' });
+      
+      const assignedCourseIds = faculty.subjects.map(s => s.courseId);
+      where.courseId = { in: assignedCourseIds };
+    }
+
     const total = await prisma.student.count({ where });
     const students = await prisma.student.findMany({
       where,

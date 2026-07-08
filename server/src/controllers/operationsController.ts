@@ -13,11 +13,28 @@ export const getAttendance = async (req: AuthenticatedRequest, res: Response) =>
     if (studentId) where.studentId = String(studentId);
     if (date) where.date = new Date(String(date));
 
-    // If student, restrict to own profile
+    // Strict Role-Based Data Scoping
     if (req.user?.role === 'STUDENT') {
       const student = await prisma.student.findUnique({ where: { userId: req.user.id } });
       if (!student) return res.status(404).json({ error: 'Not Found', message: 'Student profile missing' });
       where.studentId = student.id;
+    } else if (req.user?.role === 'PARENT') {
+      const parent = await prisma.parent.findUnique({
+        where: { userId: req.user.id },
+        include: { students: true }
+      });
+      if (parent && parent.students.length > 0) {
+        where.studentId = { in: parent.students.map(s => s.id) };
+      }
+    } else if (req.user?.role === 'FACULTY') {
+      const faculty = await prisma.faculty.findUnique({
+        where: { userId: req.user.id },
+        include: { subjects: true }
+      });
+      if (faculty) {
+        const assignedCourseIds = faculty.subjects.map(s => s.courseId);
+        where.student = { courseId: { in: assignedCourseIds } };
+      }
     }
 
     const records = await prisma.attendance.findMany({
@@ -102,10 +119,28 @@ export const getStudentMarks = async (req: AuthenticatedRequest, res: Response) 
     if (subjectId) where.subjectId = String(subjectId);
     if (examinationId) where.examinationId = String(examinationId);
 
+    // Strict Role-Based Data Scoping
     if (req.user?.role === 'STUDENT') {
       const student = await prisma.student.findUnique({ where: { userId: req.user.id } });
       if (!student) return res.status(404).json({ error: 'Not Found', message: 'Student profile missing' });
       where.studentId = student.id;
+    } else if (req.user?.role === 'PARENT') {
+      const parent = await prisma.parent.findUnique({
+        where: { userId: req.user.id },
+        include: { students: true }
+      });
+      if (parent && parent.students.length > 0) {
+        where.studentId = { in: parent.students.map(s => s.id) };
+      }
+    } else if (req.user?.role === 'FACULTY') {
+      const faculty = await prisma.faculty.findUnique({
+        where: { userId: req.user.id },
+        include: { subjects: true }
+      });
+      if (faculty) {
+        const assignedCourseIds = faculty.subjects.map(s => s.courseId);
+        where.student = { courseId: { in: assignedCourseIds } };
+      }
     } else if (studentId) {
       where.studentId = String(studentId);
     }
@@ -162,7 +197,7 @@ export const getAssignments = async (req: AuthenticatedRequest, res: Response) =
     const where: any = {};
     if (subjectId) where.subjectId = String(subjectId);
 
-    // If Student role, find assignments for subjects in their course
+    // Strict Role-Based Data Scoping
     if (req.user?.role === 'STUDENT') {
       const student = await prisma.student.findUnique({
         where: { userId: req.user.id },
@@ -170,6 +205,23 @@ export const getAssignments = async (req: AuthenticatedRequest, res: Response) =
       });
       if (student) {
         where.subject = { courseId: student.courseId };
+      }
+    } else if (req.user?.role === 'PARENT') {
+      const parent = await prisma.parent.findUnique({
+        where: { userId: req.user.id },
+        include: { students: true }
+      });
+      if (parent && parent.students.length > 0) {
+        const courseIds = parent.students.map(s => s.courseId);
+        where.subject = { courseId: { in: courseIds } };
+      }
+    } else if (req.user?.role === 'FACULTY') {
+      const faculty = await prisma.faculty.findUnique({
+        where: { userId: req.user.id },
+        include: { subjects: true }
+      });
+      if (faculty) {
+        where.subjectId = { in: faculty.subjects.map(s => s.id) };
       }
     }
 
