@@ -42,8 +42,6 @@ A full-stack Enterprise Resource Planning (ERP) system for educational instituti
 ---
 
 ## 📁 Project Structure
-
-```
 ERP student management/
 ├── index.html              # Full SPA prototype (standalone, no build needed)
 ├── .gitignore
@@ -56,15 +54,14 @@ ERP student management/
 │   └── tsconfig.json
 │
 └── server/                 # Express backend (TypeScript)
-    ├── src/
-    │   └── controllers/
-    │       └── aiController.ts
-    ├── prisma/
-    │   └── schema.prisma
-    ├── .env.example        # Copy to .env and fill in values
-    ├── package.json
-    └── tsconfig.json
-```
+├── src/
+│   └── controllers/
+│       └── aiController.ts
+├── prisma/
+│   └── schema.prisma
+├── .env.example        # Copy to .env and fill in values
+├── package.json
+└── tsconfig.json
 
 ---
 
@@ -92,8 +89,8 @@ Just open `index.html` in your browser. All features work offline.
 
 #### 1. Clone the repository
 ```bash
-git clone https://github.com/lingeshwaran18/ERP-student-management.git
-cd ERP-student-management
+git clone https://github.com/lingeshwaran18/ERP-student-management-system.git
+cd ERP-student-management-system
 ```
 
 #### 2. Setup the backend
